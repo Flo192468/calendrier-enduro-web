@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node (server.js has no dependencies, but just in case)
+node_modules/
+npm-debug.log*
+
+# Local env
+.env
+.env.local
