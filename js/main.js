@@ -2,55 +2,11 @@
   "use strict";
 
   /* --------------------------------------------------------------------
-     Menu mobile (panneau latéral)
-     -------------------------------------------------------------------- */
-  var menuToggle = document.querySelector("[data-menu-toggle]");
-  var menu = document.getElementById("mobile-menu");
-
-  function openMenu() {
-    if (!menu) return;
-    menu.dataset.open = "true";
-    menuToggle.setAttribute("aria-expanded", "true");
-    var firstLink = menu.querySelector(".mobile-menu__link, .mobile-menu__close");
-    if (firstLink) firstLink.focus();
-    document.addEventListener("keydown", onMenuKeydown);
-  }
-
-  function closeMenu() {
-    if (!menu) return;
-    menu.dataset.open = "false";
-    menuToggle.setAttribute("aria-expanded", "false");
-    menuToggle.focus();
-    document.removeEventListener("keydown", onMenuKeydown);
-  }
-
-  function onMenuKeydown(event) {
-    if (event.key === "Escape") {
-      closeMenu();
-    }
-  }
-
-  if (menuToggle && menu) {
-    menuToggle.addEventListener("click", function () {
-      var isOpen = menu.dataset.open === "true";
-      if (isOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    });
-
-    menu.querySelectorAll("[data-menu-close]").forEach(function (el) {
-      el.addEventListener("click", closeMenu);
-    });
-  }
-
-  /* --------------------------------------------------------------------
      Randos : chargement des données et rendu (Accueil + Calendrier)
      -------------------------------------------------------------------- */
   var MONTH_ABBR = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
   var MONTH_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-  var STATUS_LABEL = { venir: "À venir", annulee: "Annulée", passee: "Passée" };
+  var STATUS_LABEL = { upcoming: "À venir", cancelled: "Annulée", past: "Passée" };
 
   function parseDateParts(isoDate) {
     var parts = isoDate.split("-");
@@ -87,14 +43,14 @@
   function cardHTML(item) {
     return (
       '<li>' +
-      '<a class="rando-card" data-status="' + item.status + '" href="fiche.html?id=' + encodeURIComponent(item.id) + '">' +
-      '<div class="rando-card__accent" aria-hidden="true"></div>' +
-      '<div class="rando-card__thumb">' +
+      '<a class="event-card" data-status="' + item.status + '" href="detail.html?id=' + encodeURIComponent(item.id) + '">' +
+      '<div class="event-card__accent" aria-hidden="true"></div>' +
+      '<div class="event-card__thumb">' +
       '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" loading="lazy" />' +
       '</div>' +
-      '<div class="rando-card__body">' +
-      '<h3 class="rando-card__title">' + escapeHtml(item.title) + '</h3>' +
-      '<p class="rando-card__meta">' + escapeHtml(item.location) + ' (' + escapeHtml(item.dept) + ') · ' + formatDateLabel(item.date) + '</p>' +
+      '<div class="event-card__body">' +
+      '<h3 class="event-card__title">' + escapeHtml(item.title) + '</h3>' +
+      '<p class="event-card__meta">' + escapeHtml(item.location) + ' (' + escapeHtml(item.dept) + ') · ' + formatDateLabel(item.date) + '</p>' +
       '<span class="badge">' + STATUS_LABEL[item.status] + '</span>' +
       '</div>' +
       '</a>' +
@@ -103,15 +59,15 @@
   }
 
   function groupSectionHTML(group) {
-    var headingId = "groupe-" + group.key + (group.isPast ? "-passees" : "");
+    var headingId = "group-" + group.key + (group.isPast ? "-past" : "");
     var title = group.isPast ? "Passées — " + group.label : group.label;
     return (
-      '<section class="rando-group" aria-labelledby="' + headingId + '">' +
-      '<div class="rando-group__header">' +
-      '<span class="rando-group__bar" aria-hidden="true"></span>' +
-      '<h2 class="rando-group__title" id="' + headingId + '">' + escapeHtml(title) + '</h2>' +
+      '<section class="event-group" aria-labelledby="' + headingId + '">' +
+      '<div class="event-group__header">' +
+      '<span class="event-group__bar" aria-hidden="true"></span>' +
+      '<h2 class="event-group__title" id="' + headingId + '">' + escapeHtml(title) + '</h2>' +
       '</div>' +
-      '<ul class="rando-list">' + group.items.map(cardHTML).join("") + '</ul>' +
+      '<ul class="event-list">' + group.items.map(cardHTML).join("") + '</ul>' +
       '</section>'
     );
   }
@@ -139,8 +95,8 @@
     return -byDateAsc(a, b);
   }
 
-  function fetchRandos() {
-    return fetch("data/randos.json").then(function (res) {
+  function fetchEvents() {
+    return fetch("data/events.json").then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
     });
@@ -149,29 +105,29 @@
   /* ---- Accueil : "Prochaines randos" ---- */
   var homeList = document.querySelector("[data-home-list]");
   if (homeList) {
-    fetchRandos()
+    fetchEvents()
       .then(function (data) {
         var upcoming = data
-          .filter(function (item) { return item.status === "venir"; })
+          .filter(function (item) { return item.status === "upcoming"; })
           .sort(byDateAsc)
           .slice(0, 3);
         homeList.innerHTML = upcoming.map(cardHTML).join("") ||
-          '<li class="rando-list__status">Aucune randonnée à venir pour le moment.</li>';
+          '<li class="event-list__status">Aucune randonnée à venir pour le moment.</li>';
       })
       .catch(function () {
-        homeList.innerHTML = '<li class="rando-list__status">Impossible de charger les randonnées pour le moment.</li>';
+        homeList.innerHTML = '<li class="event-list__status">Impossible de charger les randonnées pour le moment.</li>';
       });
   }
 
   /* ---- Calendrier : liste complète + recherche + filtres ---- */
-  var groupsWrap = document.querySelector("[data-rando-groups]");
+  var groupsWrap = document.querySelector("[data-event-groups]");
   if (groupsWrap) {
     var searchInput = document.querySelector("[data-search-input]");
     var resultsCount = document.querySelector("[data-results-count]");
     var emptyState = document.querySelector("[data-empty-state]");
     var dropdowns = Array.prototype.slice.call(document.querySelectorAll("[data-dropdown]"));
 
-    var allRandos = [];
+    var allEvents = [];
     var filters = { query: "", region: "", month: "", status: "" };
 
     var params = new URLSearchParams(window.location.search);
@@ -191,9 +147,9 @@
     }
 
     function render() {
-      var filtered = allRandos.filter(itemMatches);
-      var upcoming = filtered.filter(function (i) { return i.status !== "passee"; }).sort(byDateAsc);
-      var past = filtered.filter(function (i) { return i.status === "passee"; }).sort(byDateDesc);
+      var filtered = allEvents.filter(itemMatches);
+      var upcoming = filtered.filter(function (i) { return i.status !== "past"; }).sort(byDateAsc);
+      var past = filtered.filter(function (i) { return i.status === "past"; }).sort(byDateDesc);
       var groups = groupByMonth(upcoming, false).concat(groupByMonth(past, true));
 
       groupsWrap.innerHTML = groups.map(groupSectionHTML).join("");
@@ -275,7 +231,7 @@
       var months = [];
       var seenMonth = {};
 
-      allRandos.forEach(function (item) {
+      allEvents.forEach(function (item) {
         if (!seenRegion[item.location]) {
           seenRegion[item.location] = true;
           regions.push({ value: item.location, label: item.location + " (" + item.dept + ")" });
@@ -286,12 +242,13 @@
           months.push({ value: mk, label: monthLabel(item.date) });
         }
       });
+      regions.sort(function (a, b) { return a.value.localeCompare(b.value, "fr"); });
       months.sort(function (a, b) { return a.value < b.value ? -1 : a.value > b.value ? 1 : 0; });
 
       var statuses = [
-        { value: "venir", label: STATUS_LABEL.venir },
-        { value: "annulee", label: STATUS_LABEL.annulee },
-        { value: "passee", label: STATUS_LABEL.passee }
+        { value: "upcoming", label: STATUS_LABEL.upcoming },
+        { value: "cancelled", label: STATUS_LABEL.cancelled },
+        { value: "past", label: STATUS_LABEL.past }
       ];
 
       dropdownControllers.forEach(function (ctrl) {
@@ -309,9 +266,9 @@
       });
     }
 
-    fetchRandos()
+    fetchEvents()
       .then(function (data) {
-        allRandos = data;
+        allEvents = data;
         populateDropdownOptions();
         render();
       })
@@ -327,8 +284,8 @@
   if (mapPlaceholder && window.L) {
     var leafletMapEl = mapPlaceholder.querySelector("[data-leaflet-map]");
     var mapDropdowns = Array.prototype.slice.call(document.querySelectorAll(".map-filters [data-dropdown]"));
-    var mapFilters = { status: "", region: "" };
-    var mapRandos = [];
+    var mapFilters = { status: "", region: "", query: "" };
+    var mapEvents = [];
     var mapMarkers = [];
 
     var map = L.map(leafletMapEl, { scrollWheelZoom: false }).setView([46.6, 2.4], 6);
@@ -351,13 +308,17 @@
       return (
         '<div class="map-tooltip__title">' + escapeHtml(item.title) + '</div>' +
         '<div class="map-tooltip__date">' + formatDateLabel(item.date) + '</div>' +
-        '<a class="map-tooltip__link" href="fiche.html?id=' + encodeURIComponent(item.id) + '">Voir la fiche ›</a>'
+        '<a class="map-tooltip__link" href="detail.html?id=' + encodeURIComponent(item.id) + '">Voir la fiche ›</a>'
       );
     }
 
     function markerMatches(item) {
       if (mapFilters.status && item.status !== mapFilters.status) return false;
       if (mapFilters.region && item.location !== mapFilters.region) return false;
+      if (mapFilters.query) {
+        var haystack = normalize(item.title + " " + item.location + " " + item.dept);
+        if (haystack.indexOf(normalize(mapFilters.query)) === -1) return false;
+      }
       return true;
     }
 
@@ -365,7 +326,7 @@
       mapMarkers.forEach(function (marker) { map.removeLayer(marker); });
       mapMarkers = [];
 
-      var visible = mapRandos.filter(markerMatches).filter(function (item) {
+      var visible = mapEvents.filter(markerMatches).filter(function (item) {
         return item.lat != null && item.lng != null;
       });
 
@@ -424,9 +385,32 @@
       if (!event.target.closest(".map-filters [data-dropdown]")) closeAllMapDropdowns();
     });
 
-    fetchRandos()
+    /* ---- Sidebar bureau : recherche + toggle de statut ---- */
+    var mapSearchInput = document.querySelector("[data-map-search-input]");
+    if (mapSearchInput) {
+      mapSearchInput.addEventListener("input", function () {
+        mapFilters.query = mapSearchInput.value.trim();
+        renderMarkers();
+      });
+    }
+
+    var statusToggle = document.querySelector("[data-status-toggle]");
+    if (statusToggle) {
+      var statusToggleBtns = Array.prototype.slice.call(statusToggle.querySelectorAll(".status-toggle__btn"));
+      statusToggle.addEventListener("click", function (event) {
+        var btn = event.target.closest(".status-toggle__btn");
+        if (!btn) return;
+        mapFilters.status = btn.getAttribute("data-status-value") || "";
+        statusToggleBtns.forEach(function (b) {
+          b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+        });
+        renderMarkers();
+      });
+    }
+
+    fetchEvents()
       .then(function (data) {
-        mapRandos = data;
+        mapEvents = data;
 
         var regionDropdown = document.querySelector('.map-filters [data-dropdown="region"]');
         if (regionDropdown) {
@@ -438,6 +422,7 @@
               regions.push({ value: item.location, label: item.location + " (" + item.dept + ")" });
             }
           });
+          regions.sort(function (a, b) { return a.value.localeCompare(b.value, "fr"); });
           var panel = regionDropdown.querySelector("[data-dropdown-panel]");
           var html = '<button type="button" class="dropdown__option" role="option" data-value="" aria-selected="true">Tous les départements</button>';
           regions.forEach(function (opt) {
@@ -449,7 +434,7 @@
         renderMarkers();
       })
       .catch(function () {
-        mapRandos = [];
+        mapEvents = [];
       });
 
     var locateBtn = document.querySelector("[data-map-locate]");
@@ -489,11 +474,11 @@
   if (detailRoot) {
     var detailId = new URLSearchParams(window.location.search).get("id");
 
-    fetchRandos()
+    fetchEvents()
       .then(function (data) {
         var item = data.filter(function (i) { return i.id === detailId; })[0];
         if (!item) {
-          detailRoot.innerHTML = '<p class="detail-not-found">Randonnée introuvable. <a class="detail-link" href="calendrier.html">Retour au calendrier</a></p>';
+          detailRoot.innerHTML = '<p class="detail-not-found">Randonnée introuvable. <a class="detail-link" href="calendar.html">Retour au calendrier</a></p>';
           return;
         }
         renderDetail(item);
@@ -501,6 +486,84 @@
       .catch(function () {
         detailRoot.innerHTML = '<p class="detail-not-found">Impossible de charger cette randonnée pour le moment.</p>';
       });
+
+    function contactMethodsFor(item) {
+      var methods = [];
+      if (item.contactPhone) {
+        methods.push({
+          href: "tel:" + item.contactPhone.replace(/\s+/g, ""),
+          label: item.contactPhone,
+          icon: "icon-phone",
+          external: false
+        });
+      }
+      if (item.contactEmail) {
+        methods.push({
+          href: "mailto:" + item.contactEmail + "?subject=" + encodeURIComponent("Réservation — " + item.title),
+          label: item.contactEmail,
+          icon: "icon-envelope",
+          external: false
+        });
+      }
+      if (item.contactFormUrl) {
+        methods.push({
+          href: item.contactFormUrl,
+          label: "Formulaire de contact",
+          icon: "icon-external-link",
+          external: true
+        });
+      }
+      return methods;
+    }
+
+    function ctaLinkAttrs(method) {
+      return method.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+    }
+
+    // CTA fixe de la fiche : réservation en ligne si dispo, sinon contact organisateur,
+    // sinon état non cliquable (cf. décision produit du 16/09/2026 — randonnée non "à venir" = CTA désactivé).
+    function ctaHTML(item) {
+      if (item.status !== "upcoming") {
+        var closedLabel = item.status === "cancelled" ? "Randonnée annulée" : "Randonnée passée";
+        return '<span class="detail-cta__button detail-cta__button--disabled" aria-disabled="true">' + closedLabel + '</span>';
+      }
+
+      if (item.reservationUrl) {
+        return (
+          '<a class="detail-cta__button" href="' + escapeHtml(item.reservationUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Réserver ma place (s’ouvre dans un nouvel onglet)">' +
+          'Réserver ma place' +
+          '<svg class="icon detail-cta__external-icon" aria-hidden="true"><use href="#icon-external-link"></use></svg>' +
+          '</a>'
+        );
+      }
+
+      var methods = contactMethodsFor(item);
+
+      if (methods.length === 0) {
+        return '<span class="detail-cta__button detail-cta__button--disabled" aria-disabled="true">Contact indisponible</span>';
+      }
+
+      if (methods.length === 1) {
+        var method = methods[0];
+        return '<a class="detail-cta__button" href="' + escapeHtml(method.href) + '"' + ctaLinkAttrs(method) + '>Contacter l’organisateur</a>';
+      }
+
+      var optionsHTML = methods.map(function (method) {
+        return (
+          '<a class="contact-choice__option" role="menuitem" href="' + escapeHtml(method.href) + '"' + ctaLinkAttrs(method) + '>' +
+          '<svg class="icon" aria-hidden="true"><use href="#' + method.icon + '"></use></svg>' +
+          escapeHtml(method.label) +
+          '</a>'
+        );
+      }).join("");
+
+      return (
+        '<div class="detail-cta__wrap" data-contact-choice>' +
+        '<button type="button" class="detail-cta__button" data-contact-choice-trigger aria-haspopup="true" aria-expanded="false">Contacter l’organisateur</button>' +
+        '<div class="contact-choice__panel" data-contact-choice-panel role="menu" hidden>' + optionsHTML + '</div>' +
+        '</div>'
+      );
+    }
 
     function renderDetail(item) {
       document.title = item.title + " — Calendrier Enduro";
@@ -528,7 +591,7 @@
         '<h2>Lieu de rendez-vous</h2>' +
         '<p class="detail-meeting-row"><svg class="icon" aria-hidden="true"><use href="#icon-location-dot"></use></svg><span>' + escapeHtml(item.meetingPoint || "Communiqué ultérieurement") + '</span></p>' +
         '<div class="mini-map" data-mini-map></div>' +
-        '<a class="detail-link" href="carte.html">Voir sur la carte ›</a>' +
+        '<a class="detail-link" href="map.html">Voir sur la carte ›</a>' +
         '</div>' +
         (item.organizerName ?
           '<div class="detail-section">' +
@@ -547,11 +610,46 @@
           '<svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>' + escapeHtml(item.contactEmail) + '</a>' : '') +
         '</div>' +
         '</div>' +
-        '<div class="detail-cta">' +
-        (item.contactEmail ?
-          '<a class="detail-cta__button" href="mailto:' + escapeHtml(item.contactEmail) + '?subject=' + encodeURIComponent("Réservation — " + item.title) + '">Réserver ma place</a>' :
-          '<span class="detail-cta__button">Réserver ma place</span>') +
-        '</div>';
+        '<footer class="site-footer">' +
+        '<div class="site-footer__inner">' +
+        '<p>© 2026 Calendrier Enduro</p>' +
+        '<p class="site-footer__links">' +
+        '<a href="#" aria-disabled="true" tabindex="-1">À propos <span class="sr-only">(bientôt disponible)</span></a>' +
+        '<a href="#" aria-disabled="true" tabindex="-1">Contact <span class="sr-only">(bientôt disponible)</span></a>' +
+        '</p>' +
+        '</div>' +
+        '</footer>' +
+        '<div class="detail-cta">' + ctaHTML(item) + '</div>';
+
+      var contactChoice = detailRoot.querySelector("[data-contact-choice]");
+      if (contactChoice) {
+        var contactTrigger = contactChoice.querySelector("[data-contact-choice-trigger]");
+        var contactPanel = contactChoice.querySelector("[data-contact-choice-panel]");
+        var contactOptions = Array.prototype.slice.call(contactPanel.querySelectorAll(".contact-choice__option"));
+
+        var closeContactPanel = function () {
+          contactPanel.hidden = true;
+          contactTrigger.setAttribute("aria-expanded", "false");
+        };
+
+        contactTrigger.addEventListener("click", function () {
+          var isHidden = contactPanel.hidden;
+          contactPanel.hidden = !isHidden;
+          contactTrigger.setAttribute("aria-expanded", isHidden ? "true" : "false");
+          if (isHidden && contactOptions[0]) contactOptions[0].focus();
+        });
+
+        contactPanel.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            closeContactPanel();
+            contactTrigger.focus();
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!contactChoice.contains(event.target)) closeContactPanel();
+        });
+      }
 
       var miniMapEl = detailRoot.querySelector("[data-mini-map]");
       if (miniMapEl && window.L && item.lat != null && item.lng != null) {
@@ -588,5 +686,108 @@
         }
       });
     }
+  }
+
+  /* --------------------------------------------------------------------
+     Proposer une randonnée (submit.html) : validation accessible + envoi (Formspree)
+     -------------------------------------------------------------------- */
+  var submitForm = document.querySelector("[data-submit-form]");
+  if (submitForm) {
+    var submitStatus = submitForm.querySelector("[data-submit-status]");
+    var submitButton = submitForm.querySelector("[data-submit-button]");
+    var phoneInput = submitForm.querySelector("#organizer-phone");
+    var emailInput = submitForm.querySelector("#organizer-email");
+    var contactError = submitForm.querySelector("#organizer-contact-error");
+
+    var VALIDITY_MESSAGES = {
+      valueMissing: "Ce champ est obligatoire.",
+      typeMismatch_email: "Format d'email invalide (ex. nom@exemple.fr).",
+      typeMismatch_url: "Lien invalide (doit commencer par http:// ou https://).",
+      typeMismatch_tel: "Format de téléphone invalide."
+    };
+
+    function fieldErrorMessage(field) {
+      var validity = field.validity;
+      if (validity.valueMissing) return VALIDITY_MESSAGES.valueMissing;
+      if (validity.typeMismatch) return VALIDITY_MESSAGES["typeMismatch_" + field.type] || "Format invalide.";
+      return field.validationMessage || "Champ invalide.";
+    }
+
+    function setFieldError(field, message) {
+      var errorEl = submitForm.querySelector('[data-error-for="' + field.id + '"]');
+      if (errorEl) errorEl.textContent = message || "";
+      field.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    function clearAllErrors() {
+      var errors = submitForm.querySelectorAll(".form-field__error");
+      for (var i = 0; i < errors.length; i++) errors[i].textContent = "";
+      var fields = submitForm.querySelectorAll("[aria-invalid]");
+      for (var j = 0; j < fields.length; j++) fields[j].setAttribute("aria-invalid", "false");
+    }
+
+    function showStatus(kind, message) {
+      submitStatus.hidden = false;
+      submitStatus.className = "form-status form-status--" + kind;
+      submitStatus.setAttribute("role", kind === "error" ? "alert" : "status");
+      var iconId = kind === "error" ? "icon-alert-circle" : "icon-check-circle";
+      submitStatus.innerHTML =
+        '<svg class="icon" aria-hidden="true"><use href="#' + iconId + '"></use></svg>' +
+        "<span>" + escapeHtml(message) + "</span>";
+    }
+
+    submitForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      clearAllErrors();
+      submitStatus.hidden = true;
+
+      var firstInvalid = null;
+      var fields = Array.prototype.slice.call(
+        submitForm.querySelectorAll("input:not([name='_gotcha']), textarea")
+      );
+      fields.forEach(function (field) {
+        if (!field.checkValidity()) {
+          setFieldError(field, fieldErrorMessage(field));
+          if (!firstInvalid) firstInvalid = field;
+        }
+      });
+
+      var hasContact = phoneInput.value.trim() !== "" || emailInput.value.trim() !== "";
+      if (!hasContact) {
+        contactError.textContent = "Renseignez au moins un moyen de contact (téléphone ou email).";
+        phoneInput.setAttribute("aria-invalid", "true");
+        emailInput.setAttribute("aria-invalid", "true");
+        if (!firstInvalid) firstInvalid = phoneInput;
+      }
+
+      if (firstInvalid) {
+        showStatus("error", "Merci de corriger les champs signalés ci-dessous.");
+        firstInvalid.focus();
+        return;
+      }
+
+      var honeypot = submitForm.querySelector('[name="_gotcha"]');
+      if (honeypot && honeypot.value) return; // bot détecté : on n'envoie rien, silencieusement
+
+      submitButton.disabled = true;
+      fetch(submitForm.action, {
+        method: "POST",
+        body: new FormData(submitForm),
+        headers: { Accept: "application/json" }
+      })
+        .then(function (response) {
+          submitButton.disabled = false;
+          if (response.ok) {
+            showStatus("success", "Merci ! Votre proposition a bien été envoyée, nous la publierons après vérification.");
+            submitForm.reset();
+          } else {
+            showStatus("error", "L'envoi a échoué. Réessayez, ou contactez-nous directement.");
+          }
+        })
+        .catch(function () {
+          submitButton.disabled = false;
+          showStatus("error", "L'envoi a échoué (connexion). Réessayez, ou contactez-nous directement.");
+        });
+    });
   }
 })();
