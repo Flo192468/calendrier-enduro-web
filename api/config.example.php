@@ -2,7 +2,7 @@
 // Modèle de configuration des formulaires.
 //
 // Hébergement OVH : copier ce fichier À CÔTÉ du dossier www/ (donc hors du site public)
-//                   sous le nom calendrier-enduro-config.php, puis le compléter.
+//                   sous le nom sorties-enduro-config.php, puis le compléter.
 // Dev local       : le copier en api/config.php (ignoré par git), avec 'dev_mode' => true.
 //
 // Ne jamais versionner le fichier complété : il contient le mot de passe de la boîte e-mail.
@@ -27,8 +27,8 @@ return [
     ],
 
     // Dossier de travail (compteur anti-abus, journal en mode dev), hors du site public.
-    // OVH : __DIR__ . '/calendrier-enduro-data'   — Dev local : __DIR__ . '/../storage'
-    'storage_dir' => __DIR__ . '/calendrier-enduro-data',
+    // OVH : __DIR__ . '/sorties-enduro-data'   — Dev local : __DIR__ . '/../storage'
+    'storage_dir' => __DIR__ . '/sorties-enduro-data',
 
     // Nombre maximum d'envois par adresse IP sur la période (en secondes).
     'rate_limit' => ['max' => 5, 'window' => 3600],

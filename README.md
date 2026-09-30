@@ -82,7 +82,7 @@ Le site est prévu pour un hébergement mutualisé OVH (offre Perso), sans étap
 Pour les formulaires :
 
 1. Choisir PHP 8.1 ou plus pour l'hébergement (fichier `.ovhconfig` ou espace client OVH).
-2. Copier `api/config.example.php` **à côté** de `www/` (hors du site public), sous le nom `calendrier-enduro-config.php`. Le script le retrouve aussi quand le site est dans un sous-dossier de test comme `www/test/`.
+2. Copier `api/config.example.php` **à côté** de `www/` (hors du site public), sous le nom `sorties-enduro-config.php`. Le script le retrouve aussi quand le site est dans un sous-dossier de test comme `www/test/`.
 3. Y renseigner l'adresse de réception et les identifiants de la boîte e-mail OVH. Ce fichier ne doit jamais être versionné.
 4. Envoyer un message de test depuis `contact.html`, puis une proposition depuis `submit.html`.
 
