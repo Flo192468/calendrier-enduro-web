@@ -85,14 +85,33 @@
     });
   }
 
+  function hasImage(item) {
+    return typeof item.image === "string" && item.image.trim() !== "";
+  }
+
+  // Vignette de la carte : photo si disponible, sinon pictogramme décoratif
+  // (imageAlt seul, sans image, est ignoré).
+  function cardThumbHTML(item) {
+    if (!hasImage(item)) {
+      return (
+        '<div class="event-card__thumb event-card__thumb--empty" aria-hidden="true">' +
+        '<svg class="icon icon--fill"><use href="#icon-fa-route"></use></svg>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="event-card__thumb">' +
+      '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" loading="lazy" />' +
+      '</div>'
+    );
+  }
+
   function cardHTML(item) {
     return (
       '<li>' +
       '<a class="event-card" data-status="' + item.status + '" href="detail.html?id=' + encodeURIComponent(item.id) + '">' +
       '<div class="event-card__accent" aria-hidden="true"></div>' +
-      '<div class="event-card__thumb">' +
-      '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" loading="lazy" />' +
-      '</div>' +
+      cardThumbHTML(item) +
       '<div class="event-card__body">' +
       '<h3 class="event-card__title">' + escapeHtml(item.title) + '</h3>' +
       '<p class="event-card__meta">' + escapeHtml(item.location) + ' (' + escapeHtml(item.dept) + ') · ' + formatDateLabel(item.date) + '</p>' +
@@ -730,8 +749,10 @@
       document.title = item.title + " — Calendrier Enduro";
 
       detailRoot.innerHTML =
-        '<div class="detail-hero" data-status="' + item.status + '">' +
-        '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" />' +
+        '<div class="detail-hero' + (hasImage(item) ? '' : ' detail-hero--empty') + '" data-status="' + item.status + '">' +
+        (hasImage(item) ?
+          '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" />' :
+          '<svg class="icon icon--fill" aria-hidden="true"><use href="#icon-fa-route"></use></svg>') +
         '<span class="badge">' + STATUS_LABEL[item.status] + '</span>' +
         '</div>' +
         '<div class="detail-title-meta">' +
