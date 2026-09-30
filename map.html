@@ -8,7 +8,7 @@
   name="description"
   content="Repérez sur une carte toutes les randonnées enduro en France, filtrables par région et par statut."
 />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23e10f21'/%3E%3Ctext x='12' y='17' font-size='13' font-family='Arial, sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E" />
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -29,14 +29,25 @@
 
 <header class="site-header">
   <div class="site-header__inner">
-    <p class="site-header__title">Calendrier Enduro</p>
+    <a class="site-header__title site-logo" href="index.html" aria-label="Sorties Enduro — accueil">
+      <span class="site-logo__mark" aria-hidden="true">
+        <span class="site-logo__bike">
+          <img class="site-logo__part site-logo__part--roue-arriere" src="assets/img/logo/roue-arriere.svg" alt="" />
+          <img class="site-logo__part site-logo__part--roue-avant" src="assets/img/logo/roue-avant.svg" alt="" />
+          <img class="site-logo__part site-logo__part--chassis" src="assets/img/logo/chassis.svg" alt="" />
+          <img class="site-logo__part site-logo__part--fourche" src="assets/img/logo/fourche.svg" alt="" />
+        </span>
+        <img class="site-logo__part site-logo__part--sol" src="assets/img/logo/sol.svg" alt="" />
+      </span>
+      Sorties Enduro
+    </a>
 
     <nav class="primary-nav" aria-label="Navigation principale">
       <ul class="primary-nav__list">
         <li><a class="primary-nav__link" href="index.html">Accueil</a></li>
         <li><a class="primary-nav__link" href="calendar.html">Calendrier</a></li>
         <li><a class="primary-nav__link" href="map.html" aria-current="page">Carte</a></li>
-        <li><a class="primary-nav__link" href="#" aria-disabled="true" tabindex="-1">Contact <span class="sr-only">(bientôt disponible)</span></a></li>
+        <li><a class="primary-nav__link" href="contact.html">Contact</a></li>
       </ul>
     </nav>
   </div>
@@ -52,9 +63,9 @@
 
   <div class="map-filters">
     <div class="map-filters__row" role="group" aria-label="Filtres de la carte">
-      <div class="dropdown" data-dropdown="region">
+      <div class="dropdown" data-dropdown="dept">
         <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-          Départements
+          <span class="chip__label" data-chip-label>Département</span>
           <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
         </button>
         <div class="dropdown__panel" role="listbox" aria-label="Filtrer par département" data-dropdown-panel hidden></div>
@@ -62,16 +73,12 @@
 
       <div class="dropdown" data-dropdown="status">
         <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-          Statut
+          <span class="chip__label" data-chip-label>Statut</span>
           <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
         </button>
-        <div class="dropdown__panel" role="listbox" aria-label="Filtrer par statut" data-dropdown-panel hidden>
-          <button type="button" class="dropdown__option" role="option" data-value="" aria-selected="true">Tous les statuts</button>
-          <button type="button" class="dropdown__option" role="option" data-value="upcoming" aria-selected="false">À venir</button>
-          <button type="button" class="dropdown__option" role="option" data-value="cancelled" aria-selected="false">Annulée</button>
-          <button type="button" class="dropdown__option" role="option" data-value="past" aria-selected="false">Passée</button>
-        </div>
+        <div class="dropdown__panel" role="listbox" aria-label="Filtrer par statut" data-dropdown-panel hidden></div>
       </div>
+      <button type="button" class="filters-reset" data-filters-reset data-hide-when-inactive hidden>Réinitialiser</button>
     </div>
   </div>
 
@@ -120,7 +127,7 @@
       <p>© 2026 Calendrier Enduro</p>
       <p class="site-footer__links">
         <a href="#" aria-disabled="true" tabindex="-1">À propos <span class="sr-only">(bientôt disponible)</span></a>
-        <a href="#" aria-disabled="true" tabindex="-1">Contact <span class="sr-only">(bientôt disponible)</span></a>
+        <a href="contact.html">Contact</a>
       </p>
     </div>
   </footer>
@@ -142,12 +149,11 @@
     <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
     <span class="bottom-nav__label">Carte</span>
   </a>
-  <span class="bottom-nav__item" aria-disabled="true">
+  <a class="bottom-nav__item" href="contact.html">
     <span class="bottom-nav__indicator" aria-hidden="true"></span>
     <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
     <span class="bottom-nav__label">Contact</span>
-    <span class="sr-only">(bientôt disponible)</span>
-  </span>
+  </a>
 </nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>

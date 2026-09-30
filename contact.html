@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Contact — Calendrier Enduro</title>
+<meta
+  name="description"
+  content="Contactez l’équipe de Calendrier Enduro : question, erreur à signaler sur une randonnée, partenariat."
+/>
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu principal</a>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="icon-map" viewBox="0 0 24 24"><polygon points="1,6 8,3 16,6 23,3 23,18 16,21 8,18 1,21"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></symbol>
+  <symbol id="icon-envelope" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+</svg>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-header__title site-logo" href="index.html" aria-label="Sorties Enduro — accueil">
+      <span class="site-logo__mark" aria-hidden="true">
+        <span class="site-logo__bike">
+          <img class="site-logo__part site-logo__part--roue-arriere" src="assets/img/logo/roue-arriere.svg" alt="" />
+          <img class="site-logo__part site-logo__part--roue-avant" src="assets/img/logo/roue-avant.svg" alt="" />
+          <img class="site-logo__part site-logo__part--chassis" src="assets/img/logo/chassis.svg" alt="" />
+          <img class="site-logo__part site-logo__part--fourche" src="assets/img/logo/fourche.svg" alt="" />
+        </span>
+        <img class="site-logo__part site-logo__part--sol" src="assets/img/logo/sol.svg" alt="" />
+      </span>
+      Sorties Enduro
+    </a>
+
+    <nav class="primary-nav" aria-label="Navigation principale">
+      <ul class="primary-nav__list">
+        <li><a class="primary-nav__link" href="index.html">Accueil</a></li>
+        <li><a class="primary-nav__link" href="calendar.html">Calendrier</a></li>
+        <li><a class="primary-nav__link" href="map.html">Carte</a></li>
+        <li><a class="primary-nav__link" href="contact.html" aria-current="page">Contact</a></li>
+      </ul>
+    </nav>
+
+  </div>
+</header>
+
+<main id="main" class="form-page">
+  <div class="page-title">
+    <div class="page-title__inner">
+      <h1>Contact</h1>
+      <p>Une question, une erreur à signaler sur une randonnée ? Écrivez-nous.</p>
+    </div>
+  </div>
+
+  <div class="form-page__inner">
+    <form class="form" id="contact-form" action="api/contact.php" method="post" data-form>
+      <p class="form__note">Tous les champs sont obligatoires.</p>
+
+      <div class="field">
+        <label class="field__label" for="contact-name">Nom</label>
+        <input class="field__input" type="text" id="contact-name" name="name" autocomplete="name" required maxlength="100" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="contact-email">Adresse e-mail</label>
+        <input class="field__input" type="email" id="contact-email" name="email" autocomplete="email" required maxlength="254" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="contact-subject">Sujet</label>
+        <select class="field__input" id="contact-subject" name="subject" required data-msg-required="Choisissez un sujet.">
+          <option value="">Choisir un sujet</option>
+          <option value="question">Question générale</option>
+          <option value="error">Signaler une erreur sur une randonnée</option>
+          <option value="partnership">Partenariat</option>
+          <option value="other">Autre</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="contact-message">Message</label>
+        <textarea class="field__input" id="contact-message" name="message" rows="6" required minlength="10" maxlength="5000"></textarea>
+      </div>
+
+      <!-- Champ piège anti-robots : invisible, à laisser vide. -->
+      <div class="field-trap" aria-hidden="true">
+        <label for="contact-website">Ne pas remplir ce champ</label>
+        <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="form_started" value="" />
+
+      <div class="field field--checkbox">
+        <input class="field__checkbox" type="checkbox" id="contact-consent" name="consent" value="1" required />
+        <label class="field__label" for="contact-consent">J’accepte que ces informations soient utilisées pour répondre à ma demande.</label>
+      </div>
+
+      <p class="form-status" role="alert" data-form-status hidden></p>
+
+      <button class="form__submit" type="submit" data-form-submit>Envoyer le message</button>
+    </form>
+
+    <div class="form-success" data-form-success="contact-form" tabindex="-1" hidden>
+      <h2>Message envoyé</h2>
+      <p>Merci ! Nous vous répondrons dès que possible.</p>
+      <a class="form-link" href="index.html">Retour à l’accueil</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>© 2026 Calendrier Enduro</p>
+      <p class="site-footer__links">
+        <a href="#" aria-disabled="true" tabindex="-1">À propos <span class="sr-only">(bientôt disponible)</span></a>
+        <a href="contact.html" aria-current="page">Contact</a>
+      </p>
+    </div>
+  </footer>
+</main>
+
+<nav class="bottom-nav" aria-label="Navigation principale (mobile)">
+  <a class="bottom-nav__item" href="index.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
+    <span class="bottom-nav__label">Accueil</span>
+  </a>
+  <a class="bottom-nav__item" href="calendar.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+    <span class="bottom-nav__label">Calendrier</span>
+  </a>
+  <a class="bottom-nav__item" href="map.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
+    <span class="bottom-nav__label">Carte</span>
+  </a>
+  <a class="bottom-nav__item" href="contact.html" aria-current="page">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
+    <span class="bottom-nav__label">Contact</span>
+  </a>
+</nav>
+
+<script src="js/main.js"></script>
+<script src="js/forms.js"></script>
+</body>
+</html>

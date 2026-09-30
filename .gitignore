@@ -17,3 +17,7 @@ npm-debug.log*
 
 # Claude Code local context (personal, not for sharing)
 CLAUDE.md
+
+# Formulaires : configuration locale (mot de passe SMTP) et dossier de travail
+api/config.php
+storage/
