@@ -34,6 +34,9 @@
     if (validity.patternMismatch) {
       return custom.msgPattern || "Le format saisi n’est pas valide.";
     }
+    if (validity.stepMismatch) {
+      return custom.msgStep || "La valeur saisie n’est pas valide.";
+    }
     if (validity.rangeUnderflow) {
       return custom.msgRange || "La valeur doit être supérieure ou égale à " + field.min + ".";
     }
@@ -55,6 +58,12 @@
     // La validation est prise en charge ici : on coupe les bulles natives du navigateur.
     form.noValidate = true;
     if (started) started.value = String(Math.floor(Date.now() / 1000));
+
+    // Champs date marqués data-min-today : pas de date passée (date locale, pas UTC).
+    Array.prototype.slice.call(form.querySelectorAll("[data-min-today]")).forEach(function (field) {
+      var now = new Date();
+      field.min = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+    });
 
     function errorEl(field) {
       var id = field.id + "-error";

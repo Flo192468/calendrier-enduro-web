@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Proposer une randonnée — Calendrier Enduro</title>
+<meta
+  name="description"
+  content="Organisateurs : proposez gratuitement votre randonnée enduro pour qu’elle apparaisse dans le calendrier."
+/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23e10f21'/%3E%3Ctext x='12' y='17' font-size='13' font-family='Arial, sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu principal</a>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="icon-map" viewBox="0 0 24 24"><polygon points="1,6 8,3 16,6 23,3 23,18 16,21 8,18 1,21"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></symbol>
+  <symbol id="icon-envelope" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+  <symbol id="icon-bars" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></symbol>
+</svg>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <p class="site-header__title">Calendrier Enduro</p>
+
+    <nav class="primary-nav" aria-label="Navigation principale">
+      <ul class="primary-nav__list">
+        <li><a class="primary-nav__link" href="index.html">Accueil</a></li>
+        <li><a class="primary-nav__link" href="calendrier.html">Calendrier</a></li>
+        <li><a class="primary-nav__link" href="carte.html">Carte</a></li>
+        <li><a class="primary-nav__link" href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      class="menu-btn"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-menu-toggle
+    >
+      <svg class="icon" aria-hidden="true"><use href="#icon-bars"></use></svg>
+      <span class="sr-only">Ouvrir le menu</span>
+    </button>
+  </div>
+</header>
+
+<main id="main" class="form-page">
+  <div class="form-page__inner">
+    <h1>Proposer une randonnée</h1>
+    <p class="form-page__intro">Vous organisez une randonnée enduro ? Décrivez-la ici : après vérification, nous l’ajoutons gratuitement au calendrier.</p>
+
+    <form class="form" id="proposer-form" action="api/proposer.php" method="post" data-form>
+      <p class="form__note">Les champs sont obligatoires, sauf mention « facultatif ».</p>
+
+      <fieldset class="form__group">
+        <legend class="form__legend">La randonnée</legend>
+
+        <div class="field">
+          <label class="field__label" for="rando-title">Nom de la randonnée</label>
+          <input class="field__input" type="text" id="rando-title" name="title" required maxlength="100" />
+        </div>
+
+        <div class="form__row">
+          <div class="field">
+            <label class="field__label" for="rando-date">Date</label>
+            <input class="field__input" type="date" id="rando-date" name="date" required data-min-today data-msg-range="La date doit être aujourd’hui ou plus tard." />
+          </div>
+          <div class="field">
+            <label class="field__label" for="rando-time">Heure de départ <span class="field__optional">(facultatif)</span></label>
+            <input class="field__input" type="time" id="rando-time" name="time" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="rando-location">Lieu</label>
+          <input class="field__input" type="text" id="rando-location" name="location" required maxlength="100" aria-describedby="rando-location-hint" />
+          <p class="field__hint" id="rando-location-hint">Commune ou secteur, par exemple « Vercors ».</p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="rando-dept">Département</label>
+          <select class="field__input" id="rando-dept" name="dept" required data-msg-required="Choisissez un département.">
+            <option value="">Choisir un département</option>
+            <option value="01">01 — Ain</option>
+            <option value="02">02 — Aisne</option>
+            <option value="03">03 — Allier</option>
+            <option value="04">04 — Alpes-de-Haute-Provence</option>
+            <option value="05">05 — Hautes-Alpes</option>
+            <option value="06">06 — Alpes-Maritimes</option>
+            <option value="07">07 — Ardèche</option>
+            <option value="08">08 — Ardennes</option>
+            <option value="09">09 — Ariège</option>
+            <option value="10">10 — Aube</option>
+            <option value="11">11 — Aude</option>
+            <option value="12">12 — Aveyron</option>
+            <option value="13">13 — Bouches-du-Rhône</option>
+            <option value="14">14 — Calvados</option>
+            <option value="15">15 — Cantal</option>
+            <option value="16">16 — Charente</option>
+            <option value="17">17 — Charente-Maritime</option>
+            <option value="18">18 — Cher</option>
+            <option value="19">19 — Corrèze</option>
+            <option value="21">21 — Côte-d’Or</option>
+            <option value="22">22 — Côtes-d’Armor</option>
+            <option value="23">23 — Creuse</option>
+            <option value="24">24 — Dordogne</option>
+            <option value="25">25 — Doubs</option>
+            <option value="26">26 — Drôme</option>
+            <option value="27">27 — Eure</option>
+            <option value="28">28 — Eure-et-Loir</option>
+            <option value="29">29 — Finistère</option>
+            <option value="2A">2A — Corse-du-Sud</option>
+            <option value="2B">2B — Haute-Corse</option>
+            <option value="30">30 — Gard</option>
+            <option value="31">31 — Haute-Garonne</option>
+            <option value="32">32 — Gers</option>
+            <option value="33">33 — Gironde</option>
+            <option value="34">34 — Hérault</option>
+            <option value="35">35 — Ille-et-Vilaine</option>
+            <option value="36">36 — Indre</option>
+            <option value="37">37 — Indre-et-Loire</option>
+            <option value="38">38 — Isère</option>
+            <option value="39">39 — Jura</option>
+            <option value="40">40 — Landes</option>
+            <option value="41">41 — Loir-et-Cher</option>
+            <option value="42">42 — Loire</option>
+            <option value="43">43 — Haute-Loire</option>
+            <option value="44">44 — Loire-Atlantique</option>
+            <option value="45">45 — Loiret</option>
+            <option value="46">46 — Lot</option>
+            <option value="47">47 — Lot-et-Garonne</option>
+            <option value="48">48 — Lozère</option>
+            <option value="49">49 — Maine-et-Loire</option>
+            <option value="50">50 — Manche</option>
+            <option value="51">51 — Marne</option>
+            <option value="52">52 — Haute-Marne</option>
+            <option value="53">53 — Mayenne</option>
+            <option value="54">54 — Meurthe-et-Moselle</option>
+            <option value="55">55 — Meuse</option>
+            <option value="56">56 — Morbihan</option>
+            <option value="57">57 — Moselle</option>
+            <option value="58">58 — Nièvre</option>
+            <option value="59">59 — Nord</option>
+            <option value="60">60 — Oise</option>
+            <option value="61">61 — Orne</option>
+            <option value="62">62 — Pas-de-Calais</option>
+            <option value="63">63 — Puy-de-Dôme</option>
+            <option value="64">64 — Pyrénées-Atlantiques</option>
+            <option value="65">65 — Hautes-Pyrénées</option>
+            <option value="66">66 — Pyrénées-Orientales</option>
+            <option value="67">67 — Bas-Rhin</option>
+            <option value="68">68 — Haut-Rhin</option>
+            <option value="69">69 — Rhône</option>
+            <option value="70">70 — Haute-Saône</option>
+            <option value="71">71 — Saône-et-Loire</option>
+            <option value="72">72 — Sarthe</option>
+            <option value="73">73 — Savoie</option>
+            <option value="74">74 — Haute-Savoie</option>
+            <option value="75">75 — Paris</option>
+            <option value="76">76 — Seine-Maritime</option>
+            <option value="77">77 — Seine-et-Marne</option>
+            <option value="78">78 — Yvelines</option>
+            <option value="79">79 — Deux-Sèvres</option>
+            <option value="80">80 — Somme</option>
+            <option value="81">81 — Tarn</option>
+            <option value="82">82 — Tarn-et-Garonne</option>
+            <option value="83">83 — Var</option>
+            <option value="84">84 — Vaucluse</option>
+            <option value="85">85 — Vendée</option>
+            <option value="86">86 — Vienne</option>
+            <option value="87">87 — Haute-Vienne</option>
+            <option value="88">88 — Vosges</option>
+            <option value="89">89 — Yonne</option>
+            <option value="90">90 — Territoire de Belfort</option>
+            <option value="91">91 — Essonne</option>
+            <option value="92">92 — Hauts-de-Seine</option>
+            <option value="93">93 — Seine-Saint-Denis</option>
+            <option value="94">94 — Val-de-Marne</option>
+            <option value="95">95 — Val-d’Oise</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="rando-meeting">Lieu de rendez-vous</label>
+          <input class="field__input" type="text" id="rando-meeting" name="meetingPoint" required maxlength="200" autocomplete="off" aria-describedby="rando-meeting-hint" />
+          <p class="field__hint" id="rando-meeting-hint">Adresse précise, par exemple « Parking de la mairie, 38250 Villard-de-Lans ».</p>
+        </div>
+      </fieldset>
+
+      <fieldset class="form__group">
+        <legend class="form__legend">Le parcours <span class="field__optional">(facultatif)</span></legend>
+
+        <div class="form__row form__row--3">
+          <div class="field">
+            <label class="field__label" for="rando-distance">Distance (km)</label>
+            <input class="field__input" type="number" id="rando-distance" name="distanceKm" min="1" max="1000" step="any" inputmode="decimal" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="rando-price">Tarif (€)</label>
+            <input class="field__input" type="number" id="rando-price" name="price" min="0" max="1000" step="any" inputmode="decimal" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="rando-loops">Nombre de boucles</label>
+            <input class="field__input" type="number" id="rando-loops" name="loops" min="1" max="20" step="1" inputmode="numeric" data-msg-step="Saisissez un nombre entier." />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form__group">
+        <legend class="form__legend">L’organisateur</legend>
+
+        <div class="field">
+          <label class="field__label" for="rando-organizer">Nom du club ou de l’organisateur</label>
+          <input class="field__input" type="text" id="rando-organizer" name="organizerName" autocomplete="organization" required maxlength="100" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="rando-organizer-desc">Présentation <span class="field__optional">(facultatif)</span></label>
+          <textarea class="field__input" id="rando-organizer-desc" name="organizerDescription" rows="4" maxlength="1000"></textarea>
+        </div>
+
+        <div class="form__row">
+          <div class="field">
+            <label class="field__label" for="rando-email">Adresse e-mail</label>
+            <input class="field__input" type="email" id="rando-email" name="contactEmail" autocomplete="email" required maxlength="254" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="rando-phone">Téléphone <span class="field__optional">(facultatif)</span></label>
+            <input class="field__input" type="tel" id="rando-phone" name="contactPhone" autocomplete="tel" maxlength="20" pattern="(?:(?:\+|00)33\s?|0)[1-9](?:[\s.\-]?\d{2}){4}" data-msg-pattern="Saisissez un numéro de téléphone français, par exemple 06 12 34 56 78." />
+          </div>
+        </div>
+        <p class="field__hint">Ces coordonnées seront affichées sur la fiche de la randonnée pour que les pratiquants puissent vous contacter.</p>
+      </fieldset>
+
+      <div class="field">
+        <label class="field__label" for="rando-notes">Informations complémentaires <span class="field__optional">(facultatif)</span></label>
+        <textarea class="field__input" id="rando-notes" name="notes" rows="4" maxlength="2000" aria-describedby="rando-notes-hint"></textarea>
+        <p class="field__hint" id="rando-notes-hint">Lien d’inscription, niveau requis, équipement obligatoire… Non publié tel quel : sert à la vérification.</p>
+      </div>
+
+      <!-- Champ piège anti-robots : invisible, à laisser vide. -->
+      <div class="field-trap" aria-hidden="true">
+        <label for="rando-website">Ne pas remplir ce champ</label>
+        <input type="text" id="rando-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="form_started" value="" />
+
+      <div class="field field--checkbox">
+        <input class="field__checkbox" type="checkbox" id="rando-consent" name="consent" value="1" required />
+        <label class="field__label" for="rando-consent">J’accepte que ces informations soient publiées sur Calendrier Enduro.</label>
+      </div>
+
+      <p class="form-status" role="alert" data-form-status hidden></p>
+
+      <button class="form__submit" type="submit" data-form-submit>Envoyer ma proposition</button>
+    </form>
+
+    <div class="form-success" data-form-success="proposer-form" tabindex="-1" hidden>
+      <h2>Proposition envoyée</h2>
+      <p>Merci ! Nous vérifions les informations, puis votre randonnée sera ajoutée au calendrier.</p>
+      <a class="form-link" href="calendrier.html">Voir le calendrier</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Calendrier Enduro — annuaire des randonnées enduro en France. Site en cours de construction (V1).</p>
+  </footer>
+</main>
+
+<nav class="bottom-nav" aria-label="Navigation principale (mobile)">
+  <a class="bottom-nav__item" href="index.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
+    <span class="bottom-nav__label">Accueil</span>
+  </a>
+  <a class="bottom-nav__item" href="calendrier.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+    <span class="bottom-nav__label">Calendrier</span>
+  </a>
+  <a class="bottom-nav__item" href="carte.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
+    <span class="bottom-nav__label">Carte</span>
+  </a>
+  <a class="bottom-nav__item" href="contact.html">
+    <span class="bottom-nav__indicator" aria-hidden="true"></span>
+    <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
+    <span class="bottom-nav__label">Contact</span>
+  </a>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu" data-open="false">
+  <div class="mobile-menu__backdrop" data-menu-close></div>
+  <div class="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+    <button type="button" class="mobile-menu__close" data-menu-close>
+      <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+      <span class="sr-only">Fermer le menu</span>
+    </button>
+    <a class="mobile-menu__link" href="index.html">
+      <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
+      Accueil
+    </a>
+    <a class="mobile-menu__link" href="calendrier.html">
+      <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+      Calendrier
+    </a>
+    <a class="mobile-menu__link" href="carte.html">
+      <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
+      Carte
+    </a>
+    <a class="mobile-menu__link" href="contact.html">
+      <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
+      Contact
+    </a>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/forms.js"></script>
+</body>
+</html>

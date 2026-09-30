@@ -10,21 +10,36 @@ require_once __DIR__ . '/PHPMailer/PHPMailer.php';
 require_once __DIR__ . '/PHPMailer/SMTP.php';
 
 const FORM_MIN_FILL_SECONDS = 3;
+const FORM_CONFIG_NAME = 'calendrier-enduro-config.php';
+
+// Les dates saisies ("pas dans le passé") sont comparées à la date française.
+date_default_timezone_set('Europe/Paris');
 
 /* --------------------------------------------------------------------
    Configuration
    -------------------------------------------------------------------- */
 
-// Cherche d'abord hors du dossier public (hébergement OVH : à côté de www/),
-// puis dans api/config.php (dev local, fichier ignoré par git).
+// Remonte les dossiers parents du site jusqu'à trouver le fichier de configuration :
+// il est rangé à côté de www/ (hors du site public), que le site soit publié dans
+// www/ ou dans un sous-dossier comme www/test/. En dernier recours : api/config.php
+// (dev local, fichier ignoré par git).
 function form_load_config(): array
 {
-    $candidates = [
-        dirname(__DIR__, 3) . '/calendrier-enduro-config.php',
-        dirname(__DIR__) . '/config.php',
-    ];
+    $candidates = [];
+    $dir = dirname(__DIR__, 2); // racine du site
+    for ($level = 0; $level < 6; $level++) {
+        $parent = dirname($dir);
+        if ($parent === $dir) {
+            break;
+        }
+        $dir = $parent;
+        $candidates[] = $dir . '/' . FORM_CONFIG_NAME;
+    }
+    $candidates[] = dirname(__DIR__) . '/config.php';
+
     foreach ($candidates as $path) {
-        if (is_file($path)) {
+        // @ : un dossier parent peut être interdit de lecture par l'hébergeur.
+        if (@is_file($path)) {
             $config = require $path;
             if (is_array($config)) {
                 return $config;
@@ -188,8 +203,11 @@ function form_storage_dir(array $config, string $sub = ''): string
    Validation
    -------------------------------------------------------------------- */
 
-// Règles par champ : label, required, type (text | email | checkbox | choice),
-// min, max (longueur), multiline, choices (valeurs autorisées pour "choice").
+// Règles par champ :
+//   required, type (text | email | checkbox | choice | date | time | number | pattern)
+//   min, max : longueur du texte — multiline : conserve les retours à la ligne
+//   choices : valeurs autorisées (choice) — future : refuse une date passée (date)
+//   min_value, max_value, integer (number) — regex, message (pattern)
 // Retourne [données nettoyées, erreurs].
 function form_validate(array $rules, array $input): array
 {
@@ -226,10 +244,44 @@ function form_validate(array $rules, array $input): array
             $errors[$name] = 'Saisissez une adresse e-mail valide, par exemple nom@exemple.fr.';
         } elseif ($type === 'choice' && !in_array($value, $rule['choices'] ?? [], true)) {
             $errors[$name] = 'Choisissez une valeur dans la liste.';
+        } elseif ($type === 'pattern' && !preg_match($rule['regex'], $value)) {
+            $errors[$name] = $rule['message'] ?? 'Le format saisi n’est pas valide.';
+        } elseif ($type === 'time' && !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $value)) {
+            $errors[$name] = 'Saisissez une heure au format HH:MM.';
+        } elseif ($type === 'date') {
+            $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+            if ($date === false || $date->format('Y-m-d') !== $value) {
+                $errors[$name] = 'Saisissez une date valide.';
+            } elseif (!empty($rule['future']) && $value < date('Y-m-d')) {
+                $errors[$name] = 'La date doit être aujourd’hui ou plus tard.';
+            }
+        } elseif ($type === 'number') {
+            $number = str_replace(',', '.', $value);
+            if (!is_numeric($number) || (!empty($rule['integer']) && !ctype_digit($number))) {
+                $errors[$name] = !empty($rule['integer']) ? 'Saisissez un nombre entier.' : 'Saisissez un nombre.';
+            } elseif (isset($rule['min_value']) && $number < $rule['min_value']) {
+                $errors[$name] = 'La valeur doit être supérieure ou égale à ' . $rule['min_value'] . '.';
+            } elseif (isset($rule['max_value']) && $number > $rule['max_value']) {
+                $errors[$name] = 'La valeur doit être inférieure ou égale à ' . $rule['max_value'] . '.';
+            } else {
+                $data[$name] = $number + 0;
+            }
         }
     }
 
     return [$data, $errors];
+}
+
+// "Rando des Crêtes" -> "rando-des-cretes" (identifiant d'une randonnée).
+function form_slug(string $text): string
+{
+    if (function_exists('iconv')) {
+        $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        if ($ascii !== false) {
+            $text = $ascii;
+        }
+    }
+    return trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower($text)), '-');
 }
 
 // Supprime les caractères de contrôle ; les champs sur une ligne perdent aussi leurs
