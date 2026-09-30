@@ -8,7 +8,7 @@
   name="description"
   content="Contactez l’équipe de Calendrier Enduro : question, erreur à signaler sur une randonnée, partenariat."
 />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23e10f21'/%3E%3Ctext x='12' y='17' font-size='13' font-family='Arial, sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E" />
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
 <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -23,7 +23,18 @@
 
 <header class="site-header">
   <div class="site-header__inner">
-    <p class="site-header__title">Calendrier Enduro</p>
+    <a class="site-header__title site-logo" href="index.html" aria-label="Sorties Enduro — accueil">
+      <span class="site-logo__mark" aria-hidden="true">
+        <span class="site-logo__bike">
+          <img class="site-logo__part site-logo__part--roue-arriere" src="assets/img/logo/roue-arriere.svg" alt="" />
+          <img class="site-logo__part site-logo__part--roue-avant" src="assets/img/logo/roue-avant.svg" alt="" />
+          <img class="site-logo__part site-logo__part--chassis" src="assets/img/logo/chassis.svg" alt="" />
+          <img class="site-logo__part site-logo__part--fourche" src="assets/img/logo/fourche.svg" alt="" />
+        </span>
+        <img class="site-logo__part site-logo__part--sol" src="assets/img/logo/sol.svg" alt="" />
+      </span>
+      Sorties Enduro
+    </a>
 
     <nav class="primary-nav" aria-label="Navigation principale">
       <ul class="primary-nav__list">

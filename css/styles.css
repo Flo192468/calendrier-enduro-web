@@ -221,6 +221,44 @@ textarea {
   white-space: nowrap;
 }
 
+/* Logo : pictogramme moto + nom du site, lien vers l'accueil */
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-transform: uppercase;
+  border-radius: var(--radius-md);
+}
+
+.site-logo__mark {
+  position: relative;
+  flex: none;
+  width: 35px;
+  height: 35px;
+  background: #fff;
+}
+
+.site-logo__bike {
+  position: absolute;
+  left: 1.26px;
+  top: 8.13px;
+  width: 32.479px;
+  height: 18.748px;
+  transform: rotate(-21.25deg);
+}
+
+/* Les SVG gardent leurs dimensions natives : seul le placement est défini ici */
+.site-logo__part {
+  position: absolute;
+  max-width: none;
+}
+
+.site-logo__part--roue-arriere { left: 0; top: 8.76px; }
+.site-logo__part--roue-avant   { left: 21.37px; top: 7.63px; }
+.site-logo__part--chassis      { left: 0.4px; top: 1.3px; }
+.site-logo__part--fourche      { left: 19.35px; top: -0.03px; }
+.site-logo__part--sol          { left: 7.56px; top: 22.12px; }
+
 .primary-nav {
   display: none;
 }
