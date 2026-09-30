@@ -31,6 +31,7 @@
   --color-accent-cancelled: #1a1a1a;
 
   --color-error: #b00020;
+  --color-focus: #1d4ed8; /* bleu : le rouge est réservé à la marque et aux erreurs */
   --color-success: #1e7b34;
 
   /* Typo */
@@ -57,7 +58,7 @@
   --detail-cta-height: 70px;
 
   /* Focus */
-  --focus-ring: 0 0 0 3px rgba(225, 15, 33, 0.35), 0 0 0 1px var(--color-brand);
+  --focus-ring: 0 0 0 2px #fff, 0 0 0 4px var(--color-focus); /* double anneau : lisible sur fond clair comme sombre (hero) */
 }
 
 /* --------------------------------------------------------------------------
