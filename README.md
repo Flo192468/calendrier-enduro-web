@@ -22,6 +22,7 @@ api/lib/PHPMailer    Bibliothèque d'envoi d'e-mails (version dans api/lib/PHPMa
 api/config.example.php  Modèle de configuration (adresse e-mail, SMTP)
 data/events.json     Source de données des randonnées (voir ci-dessous)
 assets/img/          Visuels
+VERSION              Numéro de version du site
 server.js            Petit serveur statique Node (dev local uniquement, aucune dépendance)
 .claude/launch.json  Config pour lancer le serveur de dev depuis Claude Code
 .claude/launch.json  Config pour lancer le serveur de dev depuis Claude Code
@@ -88,6 +89,11 @@ Pour les formulaires :
 - `server.js` et `.claude/launch.json` sont des outils de développement local ; ils ne sont pas nécessaires en production.
 - La carte (`map.html`, `detail.html`) charge Leaflet depuis un CDN (cdnjs) : nécessite un accès réseau sortant, pas de clé API.
 
-## État
+## Version
 
-V1 en cours de construction.
+Version actuelle : **1.1.0** (fichier `VERSION`, publié avec le site : `/VERSION` indique la version en ligne).
+
+- 1.1.0 — formulaires Contact et Proposer une randonnée en PHP, filtres partageables par URL, pictogramme pour les randonnées sans photo, logo cliquable.
+- 1.0.0 — calendrier, carte, fiche détaillée.
+
+À chaque mise en ligne, mettre à jour `VERSION` et cette liste.
