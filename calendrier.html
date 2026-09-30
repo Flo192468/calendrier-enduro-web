@@ -63,44 +63,48 @@
   <div class="filters">
     <div class="filters__inner">
       <div style="display:flex; flex-direction:column; gap: var(--space-3); flex:1;">
-        <form class="search-field search-field--light" role="search" onsubmit="return false">
+        <form class="search-field search-field--light" role="search" action="calendrier.html" method="get">
           <label for="cal-search" class="sr-only">Rechercher une randonnée par nom, lieu ou région</label>
           <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-          <input type="search" id="cal-search" placeholder="Rechercher une randonnée..." data-search-input />
+          <input type="search" id="cal-search" name="q" placeholder="Rechercher une randonnée..." data-search-input />
         </form>
 
         <p class="results-count" role="status" data-results-count>Chargement…</p>
       </div>
 
       <div class="filters__row filters__row--inline" role="group" aria-label="Filtres rapides">
-        <div class="dropdown" data-dropdown="region">
+        <div class="dropdown" data-dropdown="dept">
           <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-            Département
+            <span class="chip__label" data-chip-label>Département</span>
             <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
           </button>
           <div class="dropdown__panel" role="listbox" aria-label="Filtrer par département" data-dropdown-panel hidden></div>
         </div>
         <div class="dropdown" data-dropdown="month">
           <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-            Date
+            <span class="chip__label" data-chip-label>Date</span>
             <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
           </button>
           <div class="dropdown__panel" role="listbox" aria-label="Filtrer par date" data-dropdown-panel hidden></div>
         </div>
         <div class="dropdown" data-dropdown="status">
           <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-            Statut
+            <span class="chip__label" data-chip-label>Statut</span>
             <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
           </button>
           <div class="dropdown__panel" role="listbox" aria-label="Filtrer par statut" data-dropdown-panel hidden></div>
         </div>
+        <button type="button" class="filters-reset" data-filters-reset data-hide-when-inactive hidden>Réinitialiser</button>
       </div>
     </div>
   </div>
 
   <div class="rando-groups" data-rando-groups></div>
 
-  <p class="empty-state" role="status" data-empty-state>Aucune randonnée ne correspond à votre recherche.</p>
+  <div class="empty-state" data-empty-state>
+    <p>Aucune randonnée ne correspond à votre recherche.</p>
+    <button type="button" class="filters-reset" data-filters-reset>Réinitialiser les filtres</button>
+  </div>
 
   <footer class="site-footer">
     <p>Calendrier Enduro — annuaire des randonnées enduro en France. Site en cours de construction (V1).</p>

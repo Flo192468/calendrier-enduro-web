@@ -782,8 +782,34 @@ main {
   transition: transform 0.15s ease;
 }
 
-.chip[aria-pressed="true"] .icon:last-child {
+.chip[aria-expanded="true"] .icon:last-child {
   transform: rotate(180deg);
+}
+
+.chip__label {
+  max-width: 18ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filters-reset {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.filters-reset:hover {
+  color: var(--color-text);
+}
+
+.filters-reset[hidden] {
+  display: none;
 }
 
 .dropdown {
@@ -887,6 +913,10 @@ main {
 
 .empty-state[data-visible="true"] {
   display: block;
+}
+
+.empty-state .filters-reset {
+  margin-top: var(--space-2);
 }
 
 .results-count {

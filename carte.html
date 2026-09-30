@@ -64,9 +64,9 @@
 
   <div class="map-filters">
     <div class="map-filters__row" role="group" aria-label="Filtres de la carte">
-      <div class="dropdown" data-dropdown="region">
+      <div class="dropdown" data-dropdown="dept">
         <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-          Départements
+          <span class="chip__label" data-chip-label>Département</span>
           <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
         </button>
         <div class="dropdown__panel" role="listbox" aria-label="Filtrer par département" data-dropdown-panel hidden></div>
@@ -74,16 +74,12 @@
 
       <div class="dropdown" data-dropdown="status">
         <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-          Statut
+          <span class="chip__label" data-chip-label>Statut</span>
           <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
         </button>
-        <div class="dropdown__panel" role="listbox" aria-label="Filtrer par statut" data-dropdown-panel hidden>
-          <button type="button" class="dropdown__option" role="option" data-value="" aria-selected="true">Tous les statuts</button>
-          <button type="button" class="dropdown__option" role="option" data-value="venir" aria-selected="false">À venir</button>
-          <button type="button" class="dropdown__option" role="option" data-value="annulee" aria-selected="false">Annulée</button>
-          <button type="button" class="dropdown__option" role="option" data-value="passee" aria-selected="false">Passée</button>
-        </div>
+        <div class="dropdown__panel" role="listbox" aria-label="Filtrer par statut" data-dropdown-panel hidden></div>
       </div>
+      <button type="button" class="filters-reset" data-filters-reset data-hide-when-inactive hidden>Réinitialiser</button>
     </div>
   </div>
 

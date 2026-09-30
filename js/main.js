@@ -71,11 +71,47 @@
     return MONTH_FULL[d.monthIndex] + " " + d.year;
   }
 
+  // Départements métropolitains, regroupés par région (utilisés pour les libellés
+  // de filtre et pour que la recherche trouve "Provence", "Isère", "Occitanie"…).
+  var REGIONS = {
+    "Auvergne-Rhône-Alpes": "01:Ain,03:Allier,07:Ardèche,15:Cantal,26:Drôme,38:Isère,42:Loire,43:Haute-Loire,63:Puy-de-Dôme,69:Rhône,73:Savoie,74:Haute-Savoie",
+    "Bourgogne-Franche-Comté": "21:Côte-d'Or,25:Doubs,39:Jura,58:Nièvre,70:Haute-Saône,71:Saône-et-Loire,89:Yonne,90:Territoire de Belfort",
+    "Bretagne": "22:Côtes-d'Armor,29:Finistère,35:Ille-et-Vilaine,56:Morbihan",
+    "Centre-Val de Loire": "18:Cher,28:Eure-et-Loir,36:Indre,37:Indre-et-Loire,41:Loir-et-Cher,45:Loiret",
+    "Corse": "2A:Corse-du-Sud,2B:Haute-Corse",
+    "Grand Est": "08:Ardennes,10:Aube,51:Marne,52:Haute-Marne,54:Meurthe-et-Moselle,55:Meuse,57:Moselle,67:Bas-Rhin,68:Haut-Rhin,88:Vosges",
+    "Hauts-de-France": "02:Aisne,59:Nord,60:Oise,62:Pas-de-Calais,80:Somme",
+    "Île-de-France": "75:Paris,77:Seine-et-Marne,78:Yvelines,91:Essonne,92:Hauts-de-Seine,93:Seine-Saint-Denis,94:Val-de-Marne,95:Val-d'Oise",
+    "Normandie": "14:Calvados,27:Eure,50:Manche,61:Orne,76:Seine-Maritime",
+    "Nouvelle-Aquitaine": "16:Charente,17:Charente-Maritime,19:Corrèze,23:Creuse,24:Dordogne,33:Gironde,40:Landes,47:Lot-et-Garonne,64:Pyrénées-Atlantiques,79:Deux-Sèvres,86:Vienne,87:Haute-Vienne",
+    "Occitanie": "09:Ariège,11:Aude,12:Aveyron,30:Gard,31:Haute-Garonne,32:Gers,34:Hérault,46:Lot,48:Lozère,65:Hautes-Pyrénées,66:Pyrénées-Orientales,81:Tarn,82:Tarn-et-Garonne",
+    "Pays de la Loire": "44:Loire-Atlantique,49:Maine-et-Loire,53:Mayenne,72:Sarthe,85:Vendée",
+    "Provence-Alpes-Côte d'Azur": "04:Alpes-de-Haute-Provence,05:Hautes-Alpes,06:Alpes-Maritimes,13:Bouches-du-Rhône,83:Var,84:Vaucluse"
+  };
+
+  var DEPARTMENTS = {};
+  Object.keys(REGIONS).forEach(function (region) {
+    REGIONS[region].split(",").forEach(function (entry) {
+      var parts = entry.split(":");
+      DEPARTMENTS[parts[0]] = { name: parts[1], region: region };
+    });
+  });
+
+  function deptLabel(code) {
+    var dept = DEPARTMENTS[code];
+    return dept ? dept.name + " (" + code + ")" : code;
+  }
+
+  // Minuscules, sans accents ; tirets et apostrophes deviennent des espaces
+  // pour que "haute provence" trouve "Alpes-de-Haute-Provence".
   function normalize(str) {
     return String(str)
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "");
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[-'’]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   function escapeHtml(str) {
@@ -146,6 +182,206 @@
     });
   }
 
+  /* ---- Options de filtre, dérivées des données ---- */
+  function deptOptions(randos) {
+    var seen = {};
+    return randos
+      .filter(function (item) {
+        if (seen[item.dept]) return false;
+        seen[item.dept] = true;
+        return true;
+      })
+      .map(function (item) { return { value: item.dept, label: deptLabel(item.dept) }; })
+      .sort(function (a, b) { return a.value < b.value ? -1 : a.value > b.value ? 1 : 0; });
+  }
+
+  function monthOptions(randos) {
+    var seen = {};
+    return randos
+      .filter(function (item) {
+        var mk = monthKey(item.date);
+        if (seen[mk]) return false;
+        seen[mk] = true;
+        return true;
+      })
+      .map(function (item) { return { value: monthKey(item.date), label: monthLabel(item.date) }; })
+      .sort(function (a, b) { return a.value < b.value ? -1 : a.value > b.value ? 1 : 0; });
+  }
+
+  function statusOptions() {
+    return ["venir", "annulee", "passee"].map(function (value) {
+      return { value: value, label: STATUS_LABEL[value] };
+    });
+  }
+
+  /* ---- Filtres <-> URL (liens partageables, état conservé au retour arrière) ---- */
+  var URL_PARAMS = { query: "q", dept: "dept", month: "mois", status: "statut" };
+
+  function readUrlFilters(filters) {
+    var params = new URLSearchParams(window.location.search);
+    Object.keys(filters).forEach(function (key) {
+      filters[key] = (params.get(URL_PARAMS[key]) || "").trim();
+    });
+    return filters;
+  }
+
+  function writeUrlFilters(filters) {
+    var params = new URLSearchParams();
+    Object.keys(filters).forEach(function (key) {
+      if (filters[key]) params.set(URL_PARAMS[key], filters[key]);
+    });
+    var qs = params.toString();
+    window.history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : "") + window.location.hash);
+  }
+
+  function hasActiveFilters(filters) {
+    return Object.keys(filters).some(function (key) { return !!filters[key]; });
+  }
+
+  /* ---- Liste déroulante de filtre (chip + listbox), partagée Calendrier / Carte ---- */
+  var dropdownRegistry = [];
+
+  function createDropdown(root, onChange) {
+    var btn = root.querySelector("[data-filter-chip]");
+    var panel = root.querySelector("[data-dropdown-panel]");
+    var labelEl = btn.querySelector("[data-chip-label]");
+    var name = labelEl.textContent.trim();
+    var allLabel = name;
+    var options = [];
+    var value = "";
+
+    panel.id = "dropdown-" + root.getAttribute("data-dropdown");
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-controls", panel.id);
+
+    function optionEls() {
+      return Array.prototype.slice.call(panel.querySelectorAll(".dropdown__option"));
+    }
+
+    function currentOption() {
+      return options.filter(function (opt) { return opt.value === value; })[0];
+    }
+
+    function renderOptions() {
+      panel.innerHTML = [{ value: "", label: allLabel }].concat(options).map(function (opt) {
+        return '<button type="button" class="dropdown__option" role="option" tabindex="-1" data-value="' + escapeHtml(opt.value) +
+          '" aria-selected="' + (opt.value === value ? "true" : "false") + '">' + escapeHtml(opt.label) + '</button>';
+      }).join("");
+    }
+
+    function renderChip() {
+      var current = currentOption();
+      btn.setAttribute("aria-pressed", current ? "true" : "false");
+      labelEl.innerHTML = current
+        ? '<span class="sr-only">' + escapeHtml(name) + ' : </span>' + escapeHtml(current.label)
+        : escapeHtml(name);
+    }
+
+    // Une valeur absente des options (URL modifiée à la main, donnée disparue) est ignorée.
+    function setValue(newValue) {
+      value = options.some(function (opt) { return opt.value === newValue; }) ? newValue : "";
+      optionEls().forEach(function (el) {
+        el.setAttribute("aria-selected", el.getAttribute("data-value") === value ? "true" : "false");
+      });
+      renderChip();
+      return value;
+    }
+
+    function setOptions(newAllLabel, newOptions) {
+      allLabel = newAllLabel;
+      options = newOptions;
+      renderOptions();
+      return setValue(value);
+    }
+
+    function open(focusSelected) {
+      dropdownRegistry.forEach(function (other) { if (other !== api) other.close(false); });
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      if (focusSelected) {
+        var els = optionEls();
+        var selected = els.filter(function (el) { return el.getAttribute("aria-selected") === "true"; })[0] || els[0];
+        if (selected) selected.focus();
+      }
+    }
+
+    function close(returnFocus) {
+      if (panel.hidden) return;
+      panel.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      if (returnFocus) btn.focus();
+    }
+
+    btn.addEventListener("click", function (event) {
+      // event.detail === 0 : activé au clavier (Entrée / Espace) -> on place le focus dans la liste.
+      if (panel.hidden) open(event.detail === 0);
+      else close(false);
+    });
+
+    btn.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        open(true);
+      }
+    });
+
+    panel.addEventListener("keydown", function (event) {
+      var els = optionEls();
+      var index = els.indexOf(document.activeElement);
+      var target = null;
+      if (event.key === "ArrowDown") target = els[Math.min(index + 1, els.length - 1)];
+      else if (event.key === "ArrowUp") target = els[Math.max(index - 1, 0)];
+      else if (event.key === "Home") target = els[0];
+      else if (event.key === "End") target = els[els.length - 1];
+      else if (event.key === "Tab") close(false);
+      if (target) {
+        event.preventDefault();
+        target.focus();
+      }
+    });
+
+    root.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !panel.hidden) {
+        event.preventDefault();
+        close(true);
+      }
+    });
+
+    panel.addEventListener("click", function (event) {
+      var option = event.target.closest(".dropdown__option");
+      if (!option) return;
+      var newValue = setValue(option.getAttribute("data-value") || "");
+      close(true);
+      onChange(newValue);
+    });
+
+    var api = {
+      root: root,
+      setOptions: setOptions,
+      setValue: setValue,
+      close: close
+    };
+    dropdownRegistry.push(api);
+    return api;
+  }
+
+  document.addEventListener("click", function (event) {
+    dropdownRegistry.forEach(function (dd) {
+      if (!dd.root.contains(event.target)) dd.close(false);
+    });
+  });
+
+  // Boutons "Réinitialiser" : ceux marqués data-hide-when-inactive ne s'affichent qu'avec un filtre actif.
+  function setupResetButtons(onReset) {
+    var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-filters-reset]"));
+    buttons.forEach(function (btn) { btn.addEventListener("click", onReset); });
+    return function update(active) {
+      buttons.forEach(function (btn) {
+        if (btn.hasAttribute("data-hide-when-inactive")) btn.hidden = !active;
+      });
+    };
+  }
+
   /* ---- Accueil : "Prochaines randos" ---- */
   var homeList = document.querySelector("[data-home-list]");
   if (homeList) {
@@ -169,22 +405,19 @@
     var searchInput = document.querySelector("[data-search-input]");
     var resultsCount = document.querySelector("[data-results-count]");
     var emptyState = document.querySelector("[data-empty-state]");
-    var dropdowns = Array.prototype.slice.call(document.querySelectorAll("[data-dropdown]"));
 
     var allRandos = [];
-    var filters = { query: "", region: "", month: "", status: "" };
-
-    var params = new URLSearchParams(window.location.search);
-    if (params.get("q")) {
-      filters.query = params.get("q");
-    }
+    var filters = readUrlFilters({ query: "", dept: "", month: "", status: "" });
 
     function itemMatches(item) {
-      if (filters.region && item.location !== filters.region) return false;
+      if (filters.dept && item.dept !== filters.dept) return false;
       if (filters.month && monthKey(item.date) !== filters.month) return false;
       if (filters.status && item.status !== filters.status) return false;
       if (filters.query) {
-        var haystack = normalize(item.title + " " + item.location + " " + item.dept + " " + formatDateLabel(item.date));
+        var dept = DEPARTMENTS[item.dept] || {};
+        var haystack = normalize([
+          item.title, item.location, item.dept, dept.name || "", dept.region || "", formatDateLabel(item.date)
+        ].join(" "));
         if (haystack.indexOf(normalize(filters.query)) === -1) return false;
       }
       return true;
@@ -211,109 +444,61 @@
       if (emptyState) {
         emptyState.dataset.visible = filtered.length === 0 ? "true" : "false";
       }
+
+      // Sans résultat, l'état vide porte déjà son propre bouton "Réinitialiser les filtres".
+      updateResetButtons(hasActiveFilters(filters) && filtered.length > 0);
     }
 
-    /* ---- Dropdowns de filtre (Département / Date / Statut) ---- */
-    function closeAllDropdowns(except) {
-      dropdowns.forEach(function (dd) {
-        if (dd === except) return;
-        var btn = dd.querySelector("[data-filter-chip]");
-        var panel = dd.querySelector("[data-dropdown-panel]");
-        panel.hidden = true;
-        btn.setAttribute("aria-expanded", "false");
+    function update() {
+      writeUrlFilters(filters);
+      render();
+    }
+
+    var dropdowns = {};
+    Array.prototype.slice.call(document.querySelectorAll("[data-dropdown]")).forEach(function (root) {
+      var key = root.getAttribute("data-dropdown"); // "dept" | "month" | "status"
+      dropdowns[key] = createDropdown(root, function (value) {
+        filters[key] = value;
+        update();
       });
-    }
+    });
 
-    function setupDropdown(dd) {
-      var key = dd.getAttribute("data-dropdown"); // "region" | "month" | "status"
-      var btn = dd.querySelector("[data-filter-chip]");
-      var panel = dd.querySelector("[data-dropdown-panel]");
-
-      function renderOptions(defaultLabel, options) {
-        var current = filters[key];
-        var html = '<button type="button" class="dropdown__option" role="option" data-value="" aria-selected="' +
-          (current === "" ? "true" : "false") + '">' + escapeHtml(defaultLabel) + '</button>';
-        options.forEach(function (opt) {
-          html += '<button type="button" class="dropdown__option" role="option" data-value="' + escapeHtml(opt.value) + '" aria-selected="' +
-            (current === opt.value ? "true" : "false") + '">' + escapeHtml(opt.label) + '</button>';
-        });
-        panel.innerHTML = html;
+    var updateResetButtons = setupResetButtons(function () {
+      Object.keys(filters).forEach(function (key) { filters[key] = ""; });
+      Object.keys(dropdowns).forEach(function (key) { dropdowns[key].setValue(""); });
+      if (searchInput) {
+        searchInput.value = "";
+        searchInput.focus();
       }
-
-      panel.addEventListener("click", function (event) {
-        var option = event.target.closest(".dropdown__option");
-        if (!option) return;
-        filters[key] = option.getAttribute("data-value") || "";
-        btn.setAttribute("aria-pressed", filters[key] ? "true" : "false");
-        closeAllDropdowns();
-        btn.setAttribute("aria-expanded", "false");
-        render();
-      });
-
-      btn.addEventListener("click", function () {
-        var isOpen = !panel.hidden;
-        closeAllDropdowns(dd);
-        panel.hidden = isOpen;
-        btn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-      });
-
-      return { key: key, renderOptions: renderOptions };
-    }
-
-    var dropdownControllers = dropdowns.map(setupDropdown);
-
-    document.addEventListener("click", function (event) {
-      if (!event.target.closest("[data-dropdown]")) closeAllDropdowns();
-    });
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") closeAllDropdowns();
+      update();
     });
 
-    function populateDropdownOptions() {
-      var regions = [];
-      var seenRegion = {};
-      var months = [];
-      var seenMonth = {};
-
-      allRandos.forEach(function (item) {
-        if (!seenRegion[item.location]) {
-          seenRegion[item.location] = true;
-          regions.push({ value: item.location, label: item.location + " (" + item.dept + ")" });
-        }
-        var mk = monthKey(item.date);
-        if (!seenMonth[mk]) {
-          seenMonth[mk] = true;
-          months.push({ value: mk, label: monthLabel(item.date) });
-        }
-      });
-      months.sort(function (a, b) { return a.value < b.value ? -1 : a.value > b.value ? 1 : 0; });
-
-      var statuses = [
-        { value: "venir", label: STATUS_LABEL.venir },
-        { value: "annulee", label: STATUS_LABEL.annulee },
-        { value: "passee", label: STATUS_LABEL.passee }
-      ];
-
-      dropdownControllers.forEach(function (ctrl) {
-        if (ctrl.key === "region") ctrl.renderOptions("Tous les départements", regions);
-        if (ctrl.key === "month") ctrl.renderOptions("Toutes les dates", months);
-        if (ctrl.key === "status") ctrl.renderOptions("Tous les statuts", statuses);
-      });
+    // Remplit une liste et y applique la valeur venue de l'URL (ignorée si inconnue).
+    function initDropdown(key, allLabel, options) {
+      if (!dropdowns[key]) return;
+      dropdowns[key].setOptions(allLabel, options);
+      filters[key] = dropdowns[key].setValue(filters[key]);
     }
 
     if (searchInput) {
       searchInput.value = filters.query;
       searchInput.addEventListener("input", function () {
         filters.query = searchInput.value.trim();
-        render();
+        update();
+      });
+      searchInput.form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        searchInput.blur(); // referme le clavier sur mobile
       });
     }
 
     fetchRandos()
       .then(function (data) {
         allRandos = data;
-        populateDropdownOptions();
-        render();
+        initDropdown("dept", "Tous les départements", deptOptions(data));
+        initDropdown("month", "Toutes les dates", monthOptions(data));
+        initDropdown("status", "Tous les statuts", statusOptions());
+        update();
       })
       .catch(function () {
         if (resultsCount) resultsCount.textContent = "Impossible de charger les randonnées.";
@@ -326,8 +511,7 @@
   var mapPlaceholder = document.querySelector("[data-map-placeholder]");
   if (mapPlaceholder && window.L) {
     var leafletMapEl = mapPlaceholder.querySelector("[data-leaflet-map]");
-    var mapDropdowns = Array.prototype.slice.call(document.querySelectorAll(".map-filters [data-dropdown]"));
-    var mapFilters = { status: "", region: "" };
+    var mapFilters = readUrlFilters({ dept: "", status: "" });
     var mapRandos = [];
     var mapMarkers = [];
 
@@ -357,7 +541,7 @@
 
     function markerMatches(item) {
       if (mapFilters.status && item.status !== mapFilters.status) return false;
-      if (mapFilters.region && item.location !== mapFilters.region) return false;
+      if (mapFilters.dept && item.dept !== mapFilters.dept) return false;
       return true;
     }
 
@@ -382,71 +566,41 @@
       }
     }
 
-    function closeAllMapDropdowns(except) {
-      mapDropdowns.forEach(function (dd) {
-        if (dd === except) return;
-        var otherPanel = dd.querySelector("[data-dropdown-panel]");
-        var otherBtn = dd.querySelector("[data-filter-chip]");
-        otherPanel.hidden = true;
-        otherBtn.setAttribute("aria-expanded", "false");
-      });
+    function updateMap() {
+      writeUrlFilters(mapFilters);
+      updateMapResetButtons(hasActiveFilters(mapFilters));
+      renderMarkers();
     }
 
-    function setupMapDropdown(dd) {
-      var key = dd.getAttribute("data-dropdown"); // "region" | "status"
-      var btn = dd.querySelector("[data-filter-chip]");
-      var panel = dd.querySelector("[data-dropdown-panel]");
-
-      panel.addEventListener("click", function (event) {
-        var option = event.target.closest(".dropdown__option");
-        if (!option) return;
-        mapFilters[key] = option.getAttribute("data-value") || "";
-        panel.querySelectorAll(".dropdown__option").forEach(function (o) {
-          o.setAttribute("aria-selected", o === option ? "true" : "false");
-        });
-        btn.setAttribute("aria-pressed", mapFilters[key] ? "true" : "false");
-        panel.hidden = true;
-        btn.setAttribute("aria-expanded", "false");
-        renderMarkers();
+    var mapDropdowns = {};
+    Array.prototype.slice.call(document.querySelectorAll(".map-filters [data-dropdown]")).forEach(function (root) {
+      var key = root.getAttribute("data-dropdown"); // "dept" | "status"
+      mapDropdowns[key] = createDropdown(root, function (value) {
+        mapFilters[key] = value;
+        updateMap();
       });
-
-      btn.addEventListener("click", function () {
-        var isOpen = !panel.hidden;
-        closeAllMapDropdowns(dd);
-        panel.hidden = isOpen;
-        btn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-      });
-    }
-
-    mapDropdowns.forEach(setupMapDropdown);
-
-    document.addEventListener("click", function (event) {
-      if (!event.target.closest(".map-filters [data-dropdown]")) closeAllMapDropdowns();
     });
+
+    var updateMapResetButtons = setupResetButtons(function () {
+      Object.keys(mapFilters).forEach(function (key) { mapFilters[key] = ""; });
+      Object.keys(mapDropdowns).forEach(function (key) { mapDropdowns[key].setValue(""); });
+      var firstChip = document.querySelector(".map-filters [data-filter-chip]");
+      if (firstChip) firstChip.focus();
+      updateMap();
+    });
+
+    function initMapDropdown(key, allLabel, options) {
+      if (!mapDropdowns[key]) return;
+      mapDropdowns[key].setOptions(allLabel, options);
+      mapFilters[key] = mapDropdowns[key].setValue(mapFilters[key]);
+    }
 
     fetchRandos()
       .then(function (data) {
         mapRandos = data;
-
-        var regionDropdown = document.querySelector('.map-filters [data-dropdown="region"]');
-        if (regionDropdown) {
-          var regions = [];
-          var seen = {};
-          data.forEach(function (item) {
-            if (!seen[item.location]) {
-              seen[item.location] = true;
-              regions.push({ value: item.location, label: item.location + " (" + item.dept + ")" });
-            }
-          });
-          var panel = regionDropdown.querySelector("[data-dropdown-panel]");
-          var html = '<button type="button" class="dropdown__option" role="option" data-value="" aria-selected="true">Tous les départements</button>';
-          regions.forEach(function (opt) {
-            html += '<button type="button" class="dropdown__option" role="option" data-value="' + escapeHtml(opt.value) + '" aria-selected="false">' + escapeHtml(opt.label) + '</button>';
-          });
-          panel.innerHTML = html;
-        }
-
-        renderMarkers();
+        initMapDropdown("dept", "Tous les départements", deptOptions(data));
+        initMapDropdown("status", "Tous les statuts", statusOptions());
+        updateMap();
       })
       .catch(function () {
         mapRandos = [];
