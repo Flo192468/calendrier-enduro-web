@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calendrier des randonnées — Calendrier Enduro</title>
+<title>Contact — Calendrier Enduro</title>
 <meta
   name="description"
-  content="Toutes les randonnées enduro à venir et passées en France, filtrables par région, date et statut."
+  content="Contactez l’équipe de Calendrier Enduro : question, erreur à signaler sur une randonnée, partenariat."
 />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23e10f21'/%3E%3Ctext x='12' y='17' font-size='13' font-family='Arial, sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/styles.css" />
@@ -15,14 +15,12 @@
 <a class="skip-link" href="#main">Aller au contenu principal</a>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
-  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
   <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
   <symbol id="icon-map" viewBox="0 0 24 24"><polygon points="1,6 8,3 16,6 23,3 23,18 16,21 8,18 1,21"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></symbol>
   <symbol id="icon-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></symbol>
   <symbol id="icon-envelope" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
   <symbol id="icon-bars" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></symbol>
   <symbol id="icon-close" viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></symbol>
-  <symbol id="icon-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
 </svg>
 
 <header class="site-header">
@@ -32,9 +30,9 @@
     <nav class="primary-nav" aria-label="Navigation principale">
       <ul class="primary-nav__list">
         <li><a class="primary-nav__link" href="index.html">Accueil</a></li>
-        <li><a class="primary-nav__link" href="calendrier.html" aria-current="page">Calendrier</a></li>
+        <li><a class="primary-nav__link" href="calendrier.html">Calendrier</a></li>
         <li><a class="primary-nav__link" href="carte.html">Carte</a></li>
-        <li><a class="primary-nav__link" href="contact.html">Contact</a></li>
+        <li><a class="primary-nav__link" href="contact.html" aria-current="page">Contact</a></li>
       </ul>
     </nav>
 
@@ -52,58 +50,62 @@
   </div>
 </header>
 
-<main id="main">
-  <div class="page-title">
-    <div class="page-title__inner">
-      <h1>Calendrier des randonnées</h1>
-      <p>Trouvez la prochaine sortie près de chez vous.</p>
-    </div>
-  </div>
+<main id="main" class="form-page">
+  <div class="form-page__inner">
+    <h1>Contact</h1>
+    <p class="form-page__intro">Une question, une erreur à signaler sur une randonnée ? Écrivez-nous.</p>
 
-  <div class="filters">
-    <div class="filters__inner">
-      <div style="display:flex; flex-direction:column; gap: var(--space-3); flex:1;">
-        <form class="search-field search-field--light" role="search" action="calendrier.html" method="get">
-          <label for="cal-search" class="sr-only">Rechercher une randonnée par nom, lieu ou région</label>
-          <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-          <input type="search" id="cal-search" name="q" placeholder="Rechercher une randonnée..." data-search-input />
-        </form>
+    <form class="form" id="contact-form" action="api/contact.php" method="post" data-form>
+      <p class="form__note">Tous les champs sont obligatoires.</p>
 
-        <p class="results-count" role="status" data-results-count>Chargement…</p>
+      <div class="field">
+        <label class="field__label" for="contact-name">Nom</label>
+        <input class="field__input" type="text" id="contact-name" name="name" autocomplete="name" required maxlength="100" />
       </div>
 
-      <div class="filters__row filters__row--inline" role="group" aria-label="Filtres rapides">
-        <div class="dropdown" data-dropdown="dept">
-          <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-            <span class="chip__label" data-chip-label>Département</span>
-            <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
-          </button>
-          <div class="dropdown__panel" role="listbox" aria-label="Filtrer par département" data-dropdown-panel hidden></div>
-        </div>
-        <div class="dropdown" data-dropdown="month">
-          <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-            <span class="chip__label" data-chip-label>Date</span>
-            <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
-          </button>
-          <div class="dropdown__panel" role="listbox" aria-label="Filtrer par date" data-dropdown-panel hidden></div>
-        </div>
-        <div class="dropdown" data-dropdown="status">
-          <button type="button" class="chip" aria-pressed="false" aria-expanded="false" data-filter-chip>
-            <span class="chip__label" data-chip-label>Statut</span>
-            <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
-          </button>
-          <div class="dropdown__panel" role="listbox" aria-label="Filtrer par statut" data-dropdown-panel hidden></div>
-        </div>
-        <button type="button" class="filters-reset" data-filters-reset data-hide-when-inactive hidden>Réinitialiser</button>
+      <div class="field">
+        <label class="field__label" for="contact-email">Adresse e-mail</label>
+        <input class="field__input" type="email" id="contact-email" name="email" autocomplete="email" required maxlength="254" />
       </div>
+
+      <div class="field">
+        <label class="field__label" for="contact-subject">Sujet</label>
+        <select class="field__input" id="contact-subject" name="subject" required data-msg-required="Choisissez un sujet.">
+          <option value="">Choisir un sujet</option>
+          <option value="question">Question générale</option>
+          <option value="erreur">Signaler une erreur sur une randonnée</option>
+          <option value="partenariat">Partenariat</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="contact-message">Message</label>
+        <textarea class="field__input" id="contact-message" name="message" rows="6" required minlength="10" maxlength="5000"></textarea>
+      </div>
+
+      <!-- Champ piège anti-robots : invisible, à laisser vide. -->
+      <div class="field-trap" aria-hidden="true">
+        <label for="contact-website">Ne pas remplir ce champ</label>
+        <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="form_started" value="" />
+
+      <div class="field field--checkbox">
+        <input class="field__checkbox" type="checkbox" id="contact-consent" name="consent" value="1" required />
+        <label class="field__label" for="contact-consent">J’accepte que ces informations soient utilisées pour répondre à ma demande.</label>
+      </div>
+
+      <p class="form-status" role="alert" data-form-status hidden></p>
+
+      <button class="form__submit" type="submit" data-form-submit>Envoyer le message</button>
+    </form>
+
+    <div class="form-success" data-form-success="contact-form" tabindex="-1" hidden>
+      <h2>Message envoyé</h2>
+      <p>Merci ! Nous vous répondrons dès que possible.</p>
+      <a class="form-link" href="index.html">Retour à l’accueil</a>
     </div>
-  </div>
-
-  <div class="rando-groups" data-rando-groups></div>
-
-  <div class="empty-state" data-empty-state>
-    <p>Aucune randonnée ne correspond à votre recherche.</p>
-    <button type="button" class="filters-reset" data-filters-reset>Réinitialiser les filtres</button>
   </div>
 
   <footer class="site-footer">
@@ -117,7 +119,7 @@
     <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
     <span class="bottom-nav__label">Accueil</span>
   </a>
-  <a class="bottom-nav__item" href="calendrier.html" aria-current="page">
+  <a class="bottom-nav__item" href="calendrier.html">
     <span class="bottom-nav__indicator" aria-hidden="true"></span>
     <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
     <span class="bottom-nav__label">Calendrier</span>
@@ -127,7 +129,7 @@
     <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
     <span class="bottom-nav__label">Carte</span>
   </a>
-  <a class="bottom-nav__item" href="contact.html">
+  <a class="bottom-nav__item" href="contact.html" aria-current="page">
     <span class="bottom-nav__indicator" aria-hidden="true"></span>
     <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
     <span class="bottom-nav__label">Contact</span>
@@ -145,7 +147,7 @@
       <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
       Accueil
     </a>
-    <a class="mobile-menu__link" href="calendrier.html" aria-current="page">
+    <a class="mobile-menu__link" href="calendrier.html">
       <svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
       Calendrier
     </a>
@@ -153,7 +155,7 @@
       <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
       Carte
     </a>
-    <a class="mobile-menu__link" href="contact.html">
+    <a class="mobile-menu__link" href="contact.html" aria-current="page">
       <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
       Contact
     </a>
@@ -161,5 +163,6 @@
 </div>
 
 <script src="js/main.js"></script>
+<script src="js/forms.js"></script>
 </body>
 </html>

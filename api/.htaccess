@@ -1,0 +1,4 @@
+# Les fichiers de configuration ne sont jamais servis directement.
+<FilesMatch "^config.*\.php$">
+  Require all denied
+</FilesMatch>

@@ -18,6 +18,7 @@
   --color-brand: #e10f21;
   --color-brand-on-dark: #ed3324; /* variante lisible sur fond sombre, non utilisée sur cette version claire mais gardée en réserve */
   --color-on-brand: #ffffff;
+  --color-error: #b80c1a; /* texte d'erreur : rouge plus sombre que la marque, lisible en petit corps */
 
   --color-badge-venir-bg: var(--color-brand);
   --color-badge-venir-text: #ffffff;
@@ -123,7 +124,9 @@ p {
   margin: 0;
 }
 
-input {
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -1610,5 +1613,229 @@ body.detail-page {
     padding-left: var(--space-6);
     padding-right: var(--space-6);
     padding-bottom: var(--space-5);
+  }
+}
+
+/* ==========================================================================
+   Formulaires (contact, proposer une randonnée)
+   ========================================================================== */
+.form-page__inner {
+  max-width: 640px;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-5);
+}
+
+.form-page h1 {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+.form-page__intro {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.form[hidden] {
+  display: none;
+}
+
+.form__note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 16px minimum : en dessous, iOS zoome sur le champ au focus. */
+.field__input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  font-size: 16px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+textarea.field__input {
+  min-height: 140px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+select.field__input {
+  appearance: none;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c5c5c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+}
+
+.field__input:hover {
+  border-color: var(--color-text);
+}
+
+.field__input:focus-visible {
+  border-color: var(--color-brand);
+  border-radius: var(--radius-md);
+}
+
+.field__input[aria-invalid="true"],
+.field__checkbox[aria-invalid="true"] {
+  border-color: var(--color-error);
+  outline: 1px solid var(--color-error);
+}
+
+.field__hint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.field__error {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+.field__error[hidden] {
+  display: none;
+}
+
+.field--checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-3);
+}
+
+.field--checkbox .field__label {
+  font-weight: 400;
+  line-height: 1.4;
+  padding-top: 1px;
+}
+
+.field--checkbox .field__error {
+  grid-column: 2;
+}
+
+.field__checkbox {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--color-brand);
+}
+
+/* Champ piège anti-robots : sorti de l'écran plutôt que display:none, que certains robots détectent. */
+.field-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-5);
+  background: var(--color-brand);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.form__submit:hover {
+  background: #c60d1c;
+}
+
+.form__submit:disabled {
+  background: var(--color-text-muted);
+  cursor: progress;
+}
+
+.form-status {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+.form-status[hidden] {
+  display: none;
+}
+
+.form-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.form-success[hidden] {
+  display: none;
+}
+
+.form-page__inner > .form-success:first-child {
+  margin-top: 0;
+}
+
+.form-success h1,
+.form-success h2 {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.form-success p,
+.form-page li {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.form-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 900px) {
+  .form-page__inner {
+    padding-top: 40px;
+  }
+
+  .form__submit {
+    width: auto;
+    align-self: flex-start;
+    min-width: 220px;
   }
 }

@@ -14,3 +14,7 @@ npm-debug.log*
 # Local env
 .env
 .env.local
+
+# Formulaires : configuration locale (mot de passe SMTP) et dossier de travail
+api/config.php
+storage/
