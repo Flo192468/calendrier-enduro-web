@@ -746,7 +746,7 @@
     }
 
     function renderDetail(item) {
-      document.title = item.title + " — Calendrier Enduro";
+      document.title = item.title + " — Sorties Enduro";
 
       detailRoot.innerHTML =
         '<div class="detail-hero' + (hasImage(item) ? '' : ' detail-hero--empty') + '" data-status="' + item.status + '">' +
@@ -794,7 +794,7 @@
         '</div>' +
         '<footer class="site-footer">' +
         '<div class="site-footer__inner">' +
-        '<p>© 2026 Calendrier Enduro</p>' +
+        '<p>© 2026 Sorties Enduro</p>' +
         '<p class="site-footer__links">' +
         '<a href="#" aria-disabled="true" tabindex="-1">À propos <span class="sr-only">(bientôt disponible)</span></a>' +
         '<a href="contact.html">Contact</a>' +

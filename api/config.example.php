@@ -16,7 +16,7 @@ return [
 
     // Expéditeur : doit être une adresse du domaine, celle de la boîte SMTP ci-dessous.
     'mail_from' => 'contact@votre-domaine.fr',
-    'mail_from_name' => 'Calendrier Enduro',
+    'mail_from_name' => 'Sorties Enduro',
 
     // Boîte e-mail OVH utilisée pour l'envoi.
     'smtp' => [

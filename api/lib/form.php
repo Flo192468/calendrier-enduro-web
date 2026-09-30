@@ -46,7 +46,7 @@ function form_load_config(): array
             }
         }
     }
-    error_log('Calendrier Enduro : fichier de configuration introuvable (voir api/config.example.php).');
+    error_log('Sorties Enduro : fichier de configuration introuvable (voir api/config.example.php).');
     form_respond_failure(500);
 }
 
@@ -76,7 +76,7 @@ function form_send_html(int $status, string $title, array $lines): never
     $e = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     echo '<!doctype html><html lang="fr"><head><meta charset="UTF-8" />'
         . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-        . '<title>' . $e($title) . ' — Calendrier Enduro</title>'
+        . '<title>' . $e($title) . ' — Sorties Enduro</title>'
         . '<link rel="stylesheet" href="../css/styles.css" /></head><body>'
         . '<main class="form-page"><div class="form-page__inner"><h1>' . $e($title) . '</h1><ul>';
     foreach ($lines as $line) {
@@ -186,14 +186,14 @@ function form_storage_dir(array $config, string $sub = ''): string
 {
     $dir = rtrim((string) ($config['storage_dir'] ?? ''), '/');
     if ($dir === '') {
-        error_log('Calendrier Enduro : "storage_dir" manquant dans la configuration.');
+        error_log('Sorties Enduro : "storage_dir" manquant dans la configuration.');
         form_respond_failure(500);
     }
     if ($sub !== '') {
         $dir .= '/' . $sub;
     }
     if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
-        error_log('Calendrier Enduro : impossible de créer ' . $dir);
+        error_log('Sorties Enduro : impossible de créer ' . $dir);
         form_respond_failure(500);
     }
     return $dir;
@@ -326,7 +326,7 @@ function form_send_mail(array $config, string $subject, string $body, string $re
 
         // L'expéditeur reste une adresse du domaine (sinon l'e-mail part en spam) ;
         // la personne qui écrit est mise en "Répondre à".
-        $mail->setFrom($config['mail_from'], $config['mail_from_name'] ?? 'Calendrier Enduro');
+        $mail->setFrom($config['mail_from'], $config['mail_from_name'] ?? 'Sorties Enduro');
         $mail->addAddress($config['mail_to']);
         $mail->addReplyTo($replyToEmail, $replyToName);
         $mail->Subject = $subject;
@@ -334,7 +334,7 @@ function form_send_mail(array $config, string $subject, string $body, string $re
         $mail->send();
         return true;
     } catch (\Throwable $error) {
-        error_log('Calendrier Enduro : échec de l’envoi de l’e-mail — ' . $error->getMessage());
+        error_log('Sorties Enduro : échec de l’envoi de l’e-mail — ' . $error->getMessage());
         return false;
     }
 }

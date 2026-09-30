@@ -36,7 +36,7 @@ $body = "Nouveau message depuis le formulaire de contact.\n\n"
     . 'Sujet : ' . $subjectLabel . "\n\n"
     . "Message :\n" . $data['message'] . "\n";
 
-if (!form_send_mail($config, '[Calendrier Enduro] Contact — ' . $subjectLabel, $body, $data['email'], $data['name'])) {
+if (!form_send_mail($config, '[Sorties Enduro] Contact — ' . $subjectLabel, $body, $data['email'], $data['name'])) {
     form_respond_failure(502, 'Votre message n’a pas pu être envoyé. Merci de réessayer dans quelques minutes.');
 }
 

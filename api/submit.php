@@ -71,7 +71,7 @@ $record = ['receivedAt' => date('c'), 'notes' => $data['notes'], 'event' => $eve
 $file = form_storage_dir($config, 'submissions') . '/' . date('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.json';
 $saved = file_put_contents($file, json_encode($record, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX) !== false;
 if (!$saved) {
-    error_log('Calendrier Enduro : impossible d’enregistrer la proposition dans ' . $file);
+    error_log('Sorties Enduro : impossible d’enregistrer la proposition dans ' . $file);
 }
 
 $body = "Nouvelle randonnée proposée.\n\n"
@@ -86,7 +86,7 @@ $body = "Nouvelle randonnée proposée.\n\n"
     . "Entrée à relire puis ajouter dans data/events.json\n"
     . "(à compléter : image, imageAlt, lat, lng) :\n\n" . $json . "\n";
 
-if (!form_send_mail($config, '[Calendrier Enduro] Randonnée proposée — ' . $data['title'], $body, $data['contactEmail'], $data['organizerName'])) {
+if (!form_send_mail($config, '[Sorties Enduro] Randonnée proposée — ' . $data['title'], $body, $data['contactEmail'], $data['organizerName'])) {
     form_respond_failure(502, 'Votre proposition n’a pas pu être envoyée. Merci de réessayer dans quelques minutes.');
 }
 

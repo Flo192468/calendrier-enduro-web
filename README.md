@@ -1,4 +1,4 @@
-# Calendrier Enduro
+# Sorties Enduro
 
 Site vitrine (HTML/CSS/JS sans framework ni étape de build, plus quelques scripts PHP pour les formulaires) recensant les randonnées enduro en France : calendrier, carte interactive et fiche détaillée par randonnée.
 
@@ -91,8 +91,9 @@ Pour les formulaires :
 
 ## Version
 
-Version actuelle : **1.1.0** (fichier `VERSION`, publié avec le site : `/VERSION` indique la version en ligne).
+Version actuelle : **1.1.1** (fichier `VERSION`, publié avec le site : `/VERSION` indique la version en ligne).
 
+- 1.1.1 — le site s'appelle « Sorties Enduro » partout (titres, pieds de page, e-mails).
 - 1.1.0 — formulaires Contact et Proposer une randonnée en PHP, filtres partageables par URL, pictogramme pour les randonnées sans photo, logo cliquable.
 - 1.0.0 — calendrier, carte, fiche détaillée.
 
