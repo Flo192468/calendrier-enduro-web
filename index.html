@@ -40,7 +40,7 @@
           <li><a class="primary-nav__link" href="index.html" aria-current="page">Accueil</a></li>
           <li><a class="primary-nav__link" href="calendar.html">Calendrier</a></li>
           <li><a class="primary-nav__link" href="map.html">Carte</a></li>
-          <li><a class="primary-nav__link" href="#" aria-disabled="true" tabindex="-1">Contact <span class="sr-only">(bientôt disponible)</span></a></li>
+          <li><a class="primary-nav__link" href="contact.html">Contact</a></li>
         </ul>
       </nav>
     </div>
@@ -54,9 +54,9 @@
 
   <div class="hero__tools">
     <form class="search-field" role="search" action="calendar.html" method="get">
-      <label for="hero-search" class="sr-only">Rechercher une région</label>
+      <label for="hero-search" class="sr-only">Rechercher une randonnée par région, département ou lieu</label>
       <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-      <input type="search" id="hero-search" name="q" placeholder="Rechercher une région…" />
+      <input type="search" id="hero-search" name="q" placeholder="Région, département, lieu…" />
     </form>
 
     <div class="quick-links">
@@ -116,12 +116,11 @@
     <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
     <span class="bottom-nav__label">Carte</span>
   </a>
-  <span class="bottom-nav__item" aria-disabled="true">
+  <a class="bottom-nav__item" href="contact.html">
     <span class="bottom-nav__indicator" aria-hidden="true"></span>
     <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
     <span class="bottom-nav__label">Contact</span>
-    <span class="sr-only">(bientôt disponible)</span>
-  </span>
+  </a>
 </nav>
 
 <script src="js/main.js"></script>

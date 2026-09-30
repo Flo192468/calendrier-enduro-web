@@ -6,7 +6,7 @@
 <title>Proposer une randonnée — Calendrier Enduro</title>
 <meta
   name="description"
-  content="Vous organisez une randonnée enduro ? Soumettez votre événement pour qu'il soit publié sur le calendrier."
+  content="Organisateurs : proposez gratuitement votre randonnée enduro pour qu’elle apparaisse dans le calendrier."
 />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23e10f21'/%3E%3Ctext x='12' y='17' font-size='13' font-family='Arial, sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/styles.css" />
@@ -15,12 +15,10 @@
 <a class="skip-link" href="#main">Aller au contenu principal</a>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
-  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></symbol>
   <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
   <symbol id="icon-map" viewBox="0 0 24 24"><polygon points="1,6 8,3 16,6 23,3 23,18 16,21 8,18 1,21"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></symbol>
   <symbol id="icon-envelope" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
-  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></symbol>
-  <symbol id="icon-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></symbol>
 </svg>
 
 <header class="site-header">
@@ -32,153 +30,247 @@
         <li><a class="primary-nav__link" href="index.html">Accueil</a></li>
         <li><a class="primary-nav__link" href="calendar.html">Calendrier</a></li>
         <li><a class="primary-nav__link" href="map.html">Carte</a></li>
-        <li><a class="primary-nav__link" href="#" aria-disabled="true" tabindex="-1">Contact <span class="sr-only">(bientôt disponible)</span></a></li>
+        <li><a class="primary-nav__link" href="contact.html">Contact</a></li>
       </ul>
     </nav>
+
   </div>
 </header>
 
-<main id="main">
+<main id="main" class="form-page">
   <div class="page-title">
     <div class="page-title__inner">
       <h1>Proposer une randonnée</h1>
-      <p>Publiez votre événement gratuitement et touchez des centaines de pratiquants.</p>
+      <p>Vous organisez une randonnée enduro ? Décrivez-la ici : après vérification, nous l’ajoutons gratuitement au calendrier.</p>
     </div>
   </div>
 
-  <section class="section section--form">
-    <!--
-      Formspree (ou service équivalent formulaire → email) pas encore configuré :
-      remplacer YOUR_FORMSPREE_ID ci-dessous par l'ID réel une fois le compte créé
-      sur https://formspree.io/. Le formulaire fonctionne dès que l'action est mise à jour,
-      sans aucun autre changement de code.
-    -->
-    <form
-      class="form"
-      data-submit-form
-      action="https://formspree.io/f/YOUR_FORMSPREE_ID"
-      method="POST"
-      novalidate
-    >
-      <p class="form__required-note">Les champs marqués d'un astérisque (*) sont obligatoires.</p>
+  <div class="form-page__inner">
+    <form class="form" id="submit-form" action="api/submit.php" method="post" data-form>
+      <p class="form__note">Les champs sont obligatoires, sauf mention « facultatif ».</p>
 
-      <div class="form-field">
-        <label class="form-field__label" for="event-name">Nom de la rando *</label>
-        <input
-          class="form-field__input"
-          type="text"
-          id="event-name"
-          name="name"
-          required
-          aria-describedby="event-name-error"
-        />
-        <p class="form-field__error" id="event-name-error" data-error-for="event-name"></p>
-      </div>
+      <fieldset class="form__group">
+        <legend class="form__legend">La randonnée</legend>
 
-      <div class="form-field">
-        <label class="form-field__label" for="event-date">Date *</label>
-        <input
-          class="form-field__input"
-          type="date"
-          id="event-date"
-          name="date"
-          required
-          aria-describedby="event-date-error"
-        />
-        <p class="form-field__error" id="event-date-error" data-error-for="event-date"></p>
-      </div>
-
-      <div class="form-field">
-        <label class="form-field__label" for="event-location">Lieu *</label>
-        <input
-          class="form-field__input"
-          type="text"
-          id="event-location"
-          name="location"
-          placeholder="Ex. Cuxac-Cabardès (Aude)"
-          required
-          aria-describedby="event-location-error"
-        />
-        <p class="form-field__error" id="event-location-error" data-error-for="event-location"></p>
-      </div>
-
-      <div class="form-field">
-        <label class="form-field__label" for="event-description">Description courte *</label>
-        <textarea
-          class="form-field__input form-field__input--textarea"
-          id="event-description"
-          name="description"
-          rows="4"
-          required
-          aria-describedby="event-description-error"
-        ></textarea>
-        <p class="form-field__error" id="event-description-error" data-error-for="event-description"></p>
-      </div>
-
-      <fieldset class="form-fieldset">
-        <legend class="form-fieldset__legend">Coordonnées de contact *</legend>
-        <p class="form-field__hint" id="organizer-contact-hint">Renseignez au moins un moyen de contact : téléphone, email, ou les deux.</p>
-
-        <div class="form-field">
-          <label class="form-field__label" for="organizer-phone">Téléphone</label>
-          <input
-            class="form-field__input"
-            type="tel"
-            id="organizer-phone"
-            name="phone"
-            autocomplete="tel"
-            aria-describedby="organizer-contact-hint organizer-contact-error"
-          />
+        <div class="field">
+          <label class="field__label" for="event-title">Nom de la randonnée</label>
+          <input class="field__input" type="text" id="event-title" name="title" required maxlength="100" />
         </div>
 
-        <div class="form-field">
-          <label class="form-field__label" for="organizer-email">Email</label>
-          <input
-            class="form-field__input"
-            type="email"
-            id="organizer-email"
-            name="email"
-            autocomplete="email"
-            aria-describedby="organizer-contact-hint organizer-contact-error"
-          />
+        <div class="form__row">
+          <div class="field">
+            <label class="field__label" for="event-date">Date</label>
+            <input class="field__input" type="date" id="event-date" name="date" required data-min-today data-msg-range="La date doit être aujourd’hui ou plus tard." />
+          </div>
+          <div class="field">
+            <label class="field__label" for="event-time">Heure de départ <span class="field__optional">(facultatif)</span></label>
+            <input class="field__input" type="time" id="event-time" name="time" />
+          </div>
         </div>
 
-        <p class="form-field__error" id="organizer-contact-error" data-error-for="organizer-contact"></p>
+        <div class="field">
+          <label class="field__label" for="event-location">Lieu</label>
+          <input class="field__input" type="text" id="event-location" name="location" required maxlength="100" aria-describedby="event-location-hint" />
+          <p class="field__hint" id="event-location-hint">Commune ou secteur, par exemple « Vercors ».</p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="event-dept">Département</label>
+          <select class="field__input" id="event-dept" name="dept" required data-msg-required="Choisissez un département.">
+            <option value="">Choisir un département</option>
+            <option value="01">01 — Ain</option>
+            <option value="02">02 — Aisne</option>
+            <option value="03">03 — Allier</option>
+            <option value="04">04 — Alpes-de-Haute-Provence</option>
+            <option value="05">05 — Hautes-Alpes</option>
+            <option value="06">06 — Alpes-Maritimes</option>
+            <option value="07">07 — Ardèche</option>
+            <option value="08">08 — Ardennes</option>
+            <option value="09">09 — Ariège</option>
+            <option value="10">10 — Aube</option>
+            <option value="11">11 — Aude</option>
+            <option value="12">12 — Aveyron</option>
+            <option value="13">13 — Bouches-du-Rhône</option>
+            <option value="14">14 — Calvados</option>
+            <option value="15">15 — Cantal</option>
+            <option value="16">16 — Charente</option>
+            <option value="17">17 — Charente-Maritime</option>
+            <option value="18">18 — Cher</option>
+            <option value="19">19 — Corrèze</option>
+            <option value="21">21 — Côte-d’Or</option>
+            <option value="22">22 — Côtes-d’Armor</option>
+            <option value="23">23 — Creuse</option>
+            <option value="24">24 — Dordogne</option>
+            <option value="25">25 — Doubs</option>
+            <option value="26">26 — Drôme</option>
+            <option value="27">27 — Eure</option>
+            <option value="28">28 — Eure-et-Loir</option>
+            <option value="29">29 — Finistère</option>
+            <option value="2A">2A — Corse-du-Sud</option>
+            <option value="2B">2B — Haute-Corse</option>
+            <option value="30">30 — Gard</option>
+            <option value="31">31 — Haute-Garonne</option>
+            <option value="32">32 — Gers</option>
+            <option value="33">33 — Gironde</option>
+            <option value="34">34 — Hérault</option>
+            <option value="35">35 — Ille-et-Vilaine</option>
+            <option value="36">36 — Indre</option>
+            <option value="37">37 — Indre-et-Loire</option>
+            <option value="38">38 — Isère</option>
+            <option value="39">39 — Jura</option>
+            <option value="40">40 — Landes</option>
+            <option value="41">41 — Loir-et-Cher</option>
+            <option value="42">42 — Loire</option>
+            <option value="43">43 — Haute-Loire</option>
+            <option value="44">44 — Loire-Atlantique</option>
+            <option value="45">45 — Loiret</option>
+            <option value="46">46 — Lot</option>
+            <option value="47">47 — Lot-et-Garonne</option>
+            <option value="48">48 — Lozère</option>
+            <option value="49">49 — Maine-et-Loire</option>
+            <option value="50">50 — Manche</option>
+            <option value="51">51 — Marne</option>
+            <option value="52">52 — Haute-Marne</option>
+            <option value="53">53 — Mayenne</option>
+            <option value="54">54 — Meurthe-et-Moselle</option>
+            <option value="55">55 — Meuse</option>
+            <option value="56">56 — Morbihan</option>
+            <option value="57">57 — Moselle</option>
+            <option value="58">58 — Nièvre</option>
+            <option value="59">59 — Nord</option>
+            <option value="60">60 — Oise</option>
+            <option value="61">61 — Orne</option>
+            <option value="62">62 — Pas-de-Calais</option>
+            <option value="63">63 — Puy-de-Dôme</option>
+            <option value="64">64 — Pyrénées-Atlantiques</option>
+            <option value="65">65 — Hautes-Pyrénées</option>
+            <option value="66">66 — Pyrénées-Orientales</option>
+            <option value="67">67 — Bas-Rhin</option>
+            <option value="68">68 — Haut-Rhin</option>
+            <option value="69">69 — Rhône</option>
+            <option value="70">70 — Haute-Saône</option>
+            <option value="71">71 — Saône-et-Loire</option>
+            <option value="72">72 — Sarthe</option>
+            <option value="73">73 — Savoie</option>
+            <option value="74">74 — Haute-Savoie</option>
+            <option value="75">75 — Paris</option>
+            <option value="76">76 — Seine-Maritime</option>
+            <option value="77">77 — Seine-et-Marne</option>
+            <option value="78">78 — Yvelines</option>
+            <option value="79">79 — Deux-Sèvres</option>
+            <option value="80">80 — Somme</option>
+            <option value="81">81 — Tarn</option>
+            <option value="82">82 — Tarn-et-Garonne</option>
+            <option value="83">83 — Var</option>
+            <option value="84">84 — Vaucluse</option>
+            <option value="85">85 — Vendée</option>
+            <option value="86">86 — Vienne</option>
+            <option value="87">87 — Haute-Vienne</option>
+            <option value="88">88 — Vosges</option>
+            <option value="89">89 — Yonne</option>
+            <option value="90">90 — Territoire de Belfort</option>
+            <option value="91">91 — Essonne</option>
+            <option value="92">92 — Hauts-de-Seine</option>
+            <option value="93">93 — Seine-Saint-Denis</option>
+            <option value="94">94 — Val-de-Marne</option>
+            <option value="95">95 — Val-d’Oise</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="event-meeting">Lieu de rendez-vous</label>
+          <input class="field__input" type="text" id="event-meeting" name="meetingPoint" required maxlength="200" autocomplete="off" aria-describedby="event-meeting-hint" />
+          <p class="field__hint" id="event-meeting-hint">Adresse précise, par exemple « Parking de la mairie, 38250 Villard-de-Lans ».</p>
+        </div>
       </fieldset>
 
-      <div class="form-field">
-        <label class="form-field__label" for="booking-link">Lien de réservation en ligne <span class="form-field__optional">(optionnel)</span></label>
-        <p class="form-field__hint" id="booking-link-hint">Ex. HelloAsso, Weezevent… si les participants peuvent réserver en ligne.</p>
-        <input
-          class="form-field__input"
-          type="url"
-          id="booking-link"
-          name="booking_link"
-          placeholder="https://www.helloasso.com/…"
-          aria-describedby="booking-link-hint booking-link-error"
-        />
-        <p class="form-field__error" id="booking-link-error" data-error-for="booking-link"></p>
+      <fieldset class="form__group">
+        <legend class="form__legend">Le parcours <span class="field__optional">(facultatif)</span></legend>
+
+        <div class="form__row form__row--3">
+          <div class="field">
+            <label class="field__label" for="event-distance">Distance (km)</label>
+            <input class="field__input" type="number" id="event-distance" name="distanceKm" min="1" max="1000" step="any" inputmode="decimal" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="event-price">Tarif (€)</label>
+            <input class="field__input" type="number" id="event-price" name="price" min="0" max="1000" step="any" inputmode="decimal" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="event-loops">Nombre de boucles</label>
+            <input class="field__input" type="number" id="event-loops" name="loops" min="1" max="20" step="1" inputmode="numeric" data-msg-step="Saisissez un nombre entier." />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form__group">
+        <legend class="form__legend">L’organisateur</legend>
+
+        <div class="field">
+          <label class="field__label" for="event-organizer">Nom du club ou de l’organisateur</label>
+          <input class="field__input" type="text" id="event-organizer" name="organizerName" autocomplete="organization" required maxlength="100" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="event-organizer-desc">Présentation <span class="field__optional">(facultatif)</span></label>
+          <textarea class="field__input" id="event-organizer-desc" name="organizerDescription" rows="4" maxlength="1000"></textarea>
+        </div>
+
+        <div class="form__row">
+          <div class="field">
+            <label class="field__label" for="event-email">Adresse e-mail</label>
+            <input class="field__input" type="email" id="event-email" name="contactEmail" autocomplete="email" required maxlength="254" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="event-phone">Téléphone <span class="field__optional">(facultatif)</span></label>
+            <input class="field__input" type="tel" id="event-phone" name="contactPhone" autocomplete="tel" maxlength="20" pattern="(?:(?:\+|00)33\s?|0)[1-9](?:[\s.\-]?\d{2}){4}" data-msg-pattern="Saisissez un numéro de téléphone français, par exemple 06 12 34 56 78." />
+          </div>
+        </div>
+        <p class="field__hint">Ces coordonnées seront affichées sur la fiche de la randonnée pour que les pratiquants puissent vous contacter.</p>
+
+        <div class="field">
+          <label class="field__label" for="event-reservation">Lien de réservation en ligne <span class="field__optional">(facultatif)</span></label>
+          <input class="field__input" type="url" id="event-reservation" name="reservationUrl" maxlength="300" placeholder="https://www.helloasso.com/…" aria-describedby="event-reservation-hint" data-msg-type="Saisissez un lien complet, commençant par https://." />
+          <p class="field__hint" id="event-reservation-hint">HelloAsso, Weezevent… si les participants peuvent réserver en ligne.</p>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label class="field__label" for="event-notes">Informations complémentaires <span class="field__optional">(facultatif)</span></label>
+        <textarea class="field__input" id="event-notes" name="notes" rows="4" maxlength="2000" aria-describedby="event-notes-hint"></textarea>
+        <p class="field__hint" id="event-notes-hint">Niveau requis, équipement obligatoire… Non publié tel quel : sert à la vérification.</p>
       </div>
 
-      <div class="form-honeypot" aria-hidden="true">
-        <label for="website">Ne pas remplir ce champ</label>
-        <input type="text" id="website" name="_gotcha" tabindex="-1" autocomplete="off" />
+      <!-- Champ piège anti-robots : invisible, à laisser vide. -->
+      <div class="field-trap" aria-hidden="true">
+        <label for="event-website">Ne pas remplir ce champ</label>
+        <input type="text" id="event-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="form_started" value="" />
+
+      <div class="field field--checkbox">
+        <input class="field__checkbox" type="checkbox" id="event-consent" name="consent" value="1" required />
+        <label class="field__label" for="event-consent">J’accepte que ces informations soient publiées sur Calendrier Enduro.</label>
       </div>
 
-      <div class="form-actions">
-        <button class="form-submit" type="submit" data-submit-button>Envoyer ma proposition</button>
-      </div>
+      <p class="form-status" role="alert" data-form-status hidden></p>
 
-      <p class="form-status" role="status" data-submit-status hidden></p>
+      <button class="form__submit" type="submit" data-form-submit>Envoyer ma proposition</button>
     </form>
-  </section>
+
+    <div class="form-success" data-form-success="submit-form" tabindex="-1" hidden>
+      <h2>Proposition envoyée</h2>
+      <p>Merci ! Nous vérifions les informations, puis votre randonnée sera ajoutée au calendrier.</p>
+      <a class="form-link" href="calendar.html">Voir le calendrier</a>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <div class="site-footer__inner">
       <p>© 2026 Calendrier Enduro</p>
       <p class="site-footer__links">
         <a href="#" aria-disabled="true" tabindex="-1">À propos <span class="sr-only">(bientôt disponible)</span></a>
-        <a href="#" aria-disabled="true" tabindex="-1">Contact <span class="sr-only">(bientôt disponible)</span></a>
+        <a href="contact.html">Contact</a>
       </p>
     </div>
   </footer>
@@ -200,14 +292,14 @@
     <svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg>
     <span class="bottom-nav__label">Carte</span>
   </a>
-  <span class="bottom-nav__item" aria-disabled="true">
+  <a class="bottom-nav__item" href="contact.html">
     <span class="bottom-nav__indicator" aria-hidden="true"></span>
     <svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>
     <span class="bottom-nav__label">Contact</span>
-    <span class="sr-only">(bientôt disponible)</span>
-  </span>
+  </a>
 </nav>
 
 <script src="js/main.js"></script>
+<script src="js/forms.js"></script>
 </body>
 </html>

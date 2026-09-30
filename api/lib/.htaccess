@@ -1,0 +1,2 @@
+# Code interne : inclus par les scripts de api/, jamais appelé directement.
+Require all denied

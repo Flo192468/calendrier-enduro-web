@@ -127,7 +127,9 @@ p {
   margin: 0;
 }
 
-input {
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -705,8 +707,34 @@ main {
   transition: transform 0.15s ease;
 }
 
-.chip[aria-pressed="true"] .icon:last-child {
+.chip[aria-expanded="true"] .icon:last-child {
   transform: rotate(180deg);
+}
+
+.chip__label {
+  max-width: 18ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filters-reset {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.filters-reset:hover {
+  color: var(--color-text);
+}
+
+.filters-reset[hidden] {
+  display: none;
 }
 
 .dropdown {
@@ -810,6 +838,10 @@ main {
 
 .empty-state[data-visible="true"] {
   display: block;
+}
+
+.empty-state .filters-reset {
+  margin-top: var(--space-2);
 }
 
 .results-count {
@@ -1786,168 +1818,263 @@ body.detail-page {
 }
 
 /* ==========================================================================
-   Page "Proposer une randonnée"
+   Formulaires (contact, proposer une randonnée)
    ========================================================================== */
-.section--form {
-  padding-top: var(--space-2);
+.form-page__inner {
+  max-width: 640px;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-5);
+}
+
+.form-page__inner > h1 {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+.form-page__intro {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--color-text-muted);
 }
 
 .form {
-  max-width: 560px;
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  margin-top: var(--space-6);
 }
 
-.form__required-note {
+.form[hidden] {
+  display: none;
+}
+
+.form__note {
   font-size: 13px;
   color: var(--color-text-muted);
-  margin: calc(var(--space-2) * -1) 0 0;
 }
 
-.form-field {
+.field {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-field__label {
+.field__label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-text);
 }
 
-.form-field__optional {
+/* 16px minimum : en dessous, iOS zoome sur le champ au focus. */
+.field__input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  font-size: 16px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+textarea.field__input {
+  min-height: 140px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+select.field__input {
+  appearance: none;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c5c5c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+}
+
+.field__input:hover {
+  border-color: var(--color-text);
+}
+
+.field__input:focus-visible {
+  border-color: var(--color-brand);
+  border-radius: var(--radius-md);
+}
+
+.field__input[aria-invalid="true"],
+.field__checkbox[aria-invalid="true"] {
+  border-color: var(--color-error);
+  outline: 1px solid var(--color-error);
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-5) 0 0;
+  border: none;
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.form__legend {
+  padding: 0 var(--space-3) 0 0;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.form__row {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.field__optional {
   font-weight: 400;
   color: var(--color-text-muted);
 }
 
-.form-field__hint {
+.field__hint {
   font-size: 13px;
   color: var(--color-text-muted);
-  margin: 0;
 }
 
-.form-field__input {
-  width: 100%;
-  min-height: 48px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3) var(--space-4);
-  font-size: 15px;
-  color: var(--color-text);
-  background: #fff;
-}
-
-.form-field__input::placeholder {
-  color: var(--color-placeholder);
-}
-
-.form-field__input--textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.form-field__input[aria-invalid="true"] {
-  border-color: var(--color-error);
-  border-width: 2px;
-}
-
-.form-field__error {
+.field__error {
   font-size: 13px;
   font-weight: 600;
   color: var(--color-error);
-  margin: 0;
 }
 
-.form-field__error:empty {
+.field__error[hidden] {
   display: none;
 }
 
-.form-fieldset {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
+.field--checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-3);
+}
+
+.field--checkbox .field__label {
+  font-weight: 400;
+  line-height: 1.4;
+  padding-top: 1px;
+}
+
+.field--checkbox .field__error {
+  grid-column: 2;
+}
+
+.field__checkbox {
+  width: 22px;
+  height: 22px;
   margin: 0;
+  accent-color: var(--color-brand);
 }
 
-.form-fieldset__legend {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text);
-  padding: 0 4px;
-}
-
-.form-honeypot {
+/* Champ piège anti-robots : sorti de l'écran plutôt que display:none, que certains robots détectent. */
+.field-trap {
   position: absolute;
+  left: -9999px;
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
-.form-actions {
+.form__submit {
   display: flex;
-}
-
-.form-submit {
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 48px;
+  padding: 0 var(--space-5);
   background: var(--color-brand);
   color: #fff;
   border-radius: var(--radius-pill);
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.3px;
 }
 
-.form-submit:hover {
+.form__submit:hover {
   background: #c60d1c;
 }
 
-.form-submit:disabled {
-  background: var(--color-border);
-  cursor: default;
+.form__submit:disabled {
+  background: var(--color-text-muted);
+  cursor: progress;
 }
 
 .form-status {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-  border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 600;
-  background: var(--color-surface);
+  color: var(--color-error);
 }
 
 .form-status[hidden] {
   display: none;
 }
 
-.form-status .icon {
-  flex-shrink: 0;
-  margin-top: 2px;
+.form-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.form-success[hidden] {
+  display: none;
+}
+
+.form-page__inner > .form-success:first-child {
+  margin-top: 0;
+}
+
+.form-success h1,
+.form-success h2 {
   font-size: 18px;
+  font-weight: 800;
 }
 
-.form-status--success {
-  color: var(--color-success);
+.form-success p,
+.form-page li {
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.form-status--error {
-  color: var(--color-error);
+.form-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 600px) {
+  .form__row {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .form__row--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (min-width: 900px) {
-  .section--form {
-    padding-top: 8px;
-    padding-bottom: 56px;
+  .form-page__inner {
+    padding-top: 40px;
+  }
+
+  .form__submit {
+    width: auto;
+    align-self: flex-start;
+    min-width: 220px;
   }
 }
