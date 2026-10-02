@@ -909,6 +909,13 @@ main {
   font-weight: 600;
 }
 
+/* Accueil : 6 prochaines randos en bureau, 3 seulement sur mobile et tablette */
+@media (max-width: 899px) {
+  .event-list--grid > .event-card:nth-child(n + 4) {
+    display: none;
+  }
+}
+
 .event-list__status {
   padding: var(--space-4);
   color: var(--color-text-muted);

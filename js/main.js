@@ -381,7 +381,7 @@
         var upcoming = data
           .filter(function (item) { return item.status === "upcoming"; })
           .sort(byDateAsc)
-          .slice(0, 3);
+          .slice(0, 6); // 6 en bureau (2 rangées de 3) ; les 3 dernières sont masquées sous 900px en CSS
         homeList.innerHTML = upcoming.map(cardHTML).join("") ||
           '<li class="event-list__status">Aucune randonnée à venir pour le moment.</li>';
       })
