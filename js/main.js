@@ -766,7 +766,11 @@
     function renderDetail(item) {
       document.title = item.title + " — Sorties Enduro";
 
+      // Mobile : blocs empilés + CTA fixe en bas d'écran.
+      // Bureau (≥900px) : colonne principale + carte de réservation sticky qui accueille le CTA.
       detailRoot.innerHTML =
+        '<div class="detail-layout">' +
+        '<div class="detail-content">' +
         '<div class="detail-title-meta" data-status="' + item.status + '">' +
         '<span class="badge">' + STATUS_LABEL[item.status] + '</span>' +
         '<h1>' + escapeHtml(item.title) + '</h1>' +
@@ -791,8 +795,9 @@
           '<p class="detail-organizer__name">' + escapeHtml(item.organizerName) + '</p>' +
           '<p class="detail-organizer__desc">' + escapeHtml(item.organizerDescription || "") + '</p>' +
           '</div>' : '') +
-        '<div class="detail-section" style="padding-bottom: var(--space-5);">' +
-        '<h2>Réserver / contacter l’organisateur</h2>' +
+        '</div>' +
+        '<aside class="detail-section detail-booking" aria-labelledby="detail-booking-title">' +
+        '<h2 id="detail-booking-title">Réserver / contacter l’organisateur</h2>' +
         '<div class="contact-list">' +
         (item.contactPhone ?
           '<a class="contact-list__row" href="tel:' + escapeHtml(item.contactPhone.replace(/\s+/g, "")) + '">' +
@@ -801,17 +806,9 @@
           '<a class="contact-list__row" href="mailto:' + escapeHtml(item.contactEmail) + '">' +
           '<svg class="icon" aria-hidden="true"><use href="#icon-envelope"></use></svg>' + escapeHtml(item.contactEmail) + '</a>' : '') +
         '</div>' +
-        '</div>' +
-        '<footer class="site-footer">' +
-        '<div class="site-footer__inner">' +
-        '<p>© 2026 Sorties Enduro</p>' +
-        '<p class="site-footer__links">' +
-        '<a href="#" aria-disabled="true" tabindex="-1">À propos <span class="sr-only">(bientôt disponible)</span></a>' +
-        '<a href="contact.html">Contact</a>' +
-        '</p>' +
-        '</div>' +
-        '</footer>' +
-        '<div class="detail-cta">' + ctaHTML(item) + '</div>';
+        '<div class="detail-cta">' + ctaHTML(item) + '</div>' +
+        '</aside>' +
+        '</div>';
 
       var contactChoice = detailRoot.querySelector("[data-contact-choice]");
       if (contactChoice) {
@@ -869,14 +866,13 @@
       }
     }
 
-    var backBtn = document.querySelector("[data-detail-back]");
-    if (backBtn) {
+    Array.prototype.slice.call(document.querySelectorAll("[data-detail-back]")).forEach(function (backBtn) {
       backBtn.addEventListener("click", function (event) {
         if (window.history.length > 1 && document.referrer) {
           event.preventDefault();
           window.history.back();
         }
       });
-    }
+    });
   }
 })();
