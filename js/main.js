@@ -85,39 +85,44 @@
     });
   }
 
-  function hasImage(item) {
-    return typeof item.image === "string" && item.image.trim() !== "";
+  // v1.1 « Événements sans visuels » : les champs image / imageAlt de data/events.json
+  // sont conservés mais plus affichés (ni vignette de carte, ni hero de fiche).
+  var MONTH_SHORT_FORMAT = new Intl.DateTimeFormat("fr-FR", { month: "short", timeZone: "UTC" });
+  var FULL_DATE_FORMAT = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+
+  function toUtcDate(isoDate) {
+    var d = parseDateParts(isoDate);
+    return new Date(Date.UTC(Number(d.year), d.monthIndex, Number(d.day)));
   }
 
-  // Vignette de la carte : photo si disponible, sinon pictogramme décoratif
-  // (imageAlt seul, sans image, est ignoré).
-  function cardThumbHTML(item) {
-    if (!hasImage(item)) {
-      return (
-        '<div class="event-card__thumb event-card__thumb--empty" aria-hidden="true">' +
-        '<svg class="icon icon--fill"><use href="#icon-fa-route"></use></svg>' +
-        '</div>'
-      );
-    }
+  // Bloc date : jour / mois abrégé (sans point, majuscules en CSS) / année.
+  // Le lecteur d'écran lit uniquement la date complète en texte masqué.
+  function dateBlockHTML(item) {
+    var d = parseDateParts(item.date);
+    var date = toUtcDate(item.date);
     return (
-      '<div class="event-card__thumb">' +
-      '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" loading="lazy" />' +
-      '</div>'
+      '<time class="event-card__date" datetime="' + escapeHtml(item.date) + '">' +
+      '<span class="event-card__day" aria-hidden="true">' + Number(d.day) + '</span>' +
+      '<span class="event-card__month" aria-hidden="true">' + MONTH_SHORT_FORMAT.format(date).replace(/\.$/, "") + '</span>' +
+      '<span class="event-card__year" aria-hidden="true">' + d.year + '</span>' +
+      '<span class="sr-only">' + FULL_DATE_FORMAT.format(date) + '</span>' +
+      '</time>'
     );
   }
 
+  // Un seul lien par carte (sur le titre), étendu à toute la carte en CSS.
+  // « Voir la fiche › » n'est qu'un indice visuel de la liste bureau.
   function cardHTML(item) {
     return (
-      '<li>' +
-      '<a class="event-card" data-status="' + item.status + '" href="detail.html?id=' + encodeURIComponent(item.id) + '">' +
+      '<li class="event-card" data-status="' + item.status + '">' +
       '<div class="event-card__accent" aria-hidden="true"></div>' +
-      cardThumbHTML(item) +
+      dateBlockHTML(item) +
       '<div class="event-card__body">' +
-      '<h3 class="event-card__title">' + escapeHtml(item.title) + '</h3>' +
-      '<p class="event-card__meta">' + escapeHtml(item.location) + ' (' + escapeHtml(item.dept) + ') · ' + formatDateLabel(item.date) + '</p>' +
-      '<span class="badge">' + STATUS_LABEL[item.status] + '</span>' +
+      '<h3 class="event-card__title"><a class="event-card__link" href="detail.html?id=' + encodeURIComponent(item.id) + '">' + escapeHtml(item.title) + '</a></h3>' +
+      '<p class="event-card__meta">' + escapeHtml(item.location) + ' (' + escapeHtml(item.dept) + ')</p>' +
+      '<p class="event-card__status"><span class="badge">' + STATUS_LABEL[item.status] + '</span></p>' +
+      '<span class="event-card__action" aria-hidden="true">Voir la fiche ›</span>' +
       '</div>' +
-      '</a>' +
       '</li>'
     );
   }
@@ -126,7 +131,7 @@
     var headingId = "group-" + group.key + (group.isPast ? "-past" : "");
     var title = group.isPast ? "Passées — " + group.label : group.label;
     return (
-      '<section class="event-group" aria-labelledby="' + headingId + '">' +
+      '<section class="event-group' + (group.isPast ? ' event-group--past' : '') + '" aria-labelledby="' + headingId + '">' +
       '<div class="event-group__header">' +
       '<span class="event-group__bar" aria-hidden="true"></span>' +
       '<h2 class="event-group__title" id="' + headingId + '">' + escapeHtml(title) + '</h2>' +
@@ -745,29 +750,32 @@
       );
     }
 
+    // Carte d'info clé : icône + libellé en haut, valeur poussée en bas.
+    function detailStatHTML(icon, label, value) {
+      return (
+        '<div class="detail-stat">' +
+        '<div class="detail-stat__head"><svg class="icon" aria-hidden="true"><use href="#' + icon + '"></use></svg>' +
+        '<span class="detail-stat__label">' + label + '</span></div>' +
+        '<span class="detail-stat__value">' + value + '</span>' +
+        '</div>'
+      );
+    }
+
     function renderDetail(item) {
       document.title = item.title + " — Sorties Enduro";
 
       detailRoot.innerHTML =
-        '<div class="detail-hero' + (hasImage(item) ? '' : ' detail-hero--empty') + '" data-status="' + item.status + '">' +
-        (hasImage(item) ?
-          '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || "") + '" />' :
-          '<svg class="icon icon--fill" aria-hidden="true"><use href="#icon-fa-route"></use></svg>') +
+        '<div class="detail-title-meta" data-status="' + item.status + '">' +
         '<span class="badge">' + STATUS_LABEL[item.status] + '</span>' +
-        '</div>' +
-        '<div class="detail-title-meta">' +
         '<h1>' + escapeHtml(item.title) + '</h1>' +
         '<p class="detail-meta-row"><svg class="icon" aria-hidden="true"><use href="#icon-location-dot"></use></svg>' +
         escapeHtml(item.location) + ' (' + escapeHtml(item.dept) + ') · ' + formatDateLabel(item.date) + (item.time ? ' · ' + escapeHtml(item.time) : '') +
         '</p>' +
         '</div>' +
         '<div class="detail-stats">' +
-        '<div class="detail-stat"><svg class="icon" aria-hidden="true"><use href="#icon-route"></use></svg>' +
-        '<span class="detail-stat__label">Distance</span><span class="detail-stat__value">' + (item.distanceKm ? item.distanceKm + ' km' : '—') + '</span></div>' +
-        '<div class="detail-stat"><svg class="icon" aria-hidden="true"><use href="#icon-money-bill"></use></svg>' +
-        '<span class="detail-stat__label">Tarif</span><span class="detail-stat__value">' + (item.price != null ? item.price + ' €' : '—') + '</span></div>' +
-        '<div class="detail-stat"><svg class="icon" aria-hidden="true"><use href="#icon-repeat"></use></svg>' +
-        '<span class="detail-stat__label">Nombre de boucles</span><span class="detail-stat__value">' + (item.loops ? item.loops + (item.loops > 1 ? ' boucles' : ' boucle') : '—') + '</span></div>' +
+        detailStatHTML("icon-route", "Distance", item.distanceKm ? item.distanceKm + ' km' : '—') +
+        detailStatHTML("icon-money-bill", "Tarif", item.price != null ? item.price + ' €' : '—') +
+        detailStatHTML("icon-repeat", "Boucles", item.loops ? item.loops + (item.loops > 1 ? ' boucles' : ' boucle') : '—') +
         '</div>' +
         '<div class="detail-section">' +
         '<h2>Lieu de rendez-vous</h2>' +

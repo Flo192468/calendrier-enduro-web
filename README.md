@@ -59,7 +59,7 @@ Dans `api/config.php` (ignoré par git), mettre `'dev_mode' => true` et `'storag
 Rien n'est publié automatiquement. Chaque proposition arrive par e-mail, avec en fin de message une entrée au format de `data/events.json`. Pour la publier :
 
 1. Vérifier les informations auprès de l'organisateur si besoin.
-2. Compléter `image`, `imageAlt`, `lat` et `lng`.
+2. Compléter `lat` et `lng` (et, si on le souhaite, `image` / `imageAlt`, qui ne sont plus affichés depuis la v1.1).
 3. Ajouter l'entrée dans `data/events.json` et publier le fichier.
 
 Une copie de chaque proposition est aussi enregistrée dans `<storage_dir>/submissions/`, au cas où l'e-mail se perdrait.
@@ -69,7 +69,7 @@ Une copie de chaque proposition est aussi enregistrée dans `<storage_dir>/submi
 `data/events.json` est un tableau d'objets randonnée. Champs principaux :
 
 - `id`, `title`, `location`, `dept`, `date` (`AAAA-MM-JJ`), `time`, `status` (`upcoming` / `past` / `cancelled`)
-- `image`, `imageAlt`
+- `image`, `imageAlt` — conservés dans les données mais plus affichés depuis la v1.1 « Événements sans visuels » (la carte montre un bloc date, la fiche n'a plus de photo)
 - `distanceKm`, `price`, `loops`, `meetingPoint`
 - `lat`, `lng` — coordonnées du point de rendez-vous, utilisées par la carte
 - `organizerName`, `organizerDescription`, `contactPhone`, `contactEmail`
