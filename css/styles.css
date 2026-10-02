@@ -955,6 +955,11 @@ main {
   max-width: none;
 }
 
+/* En-tête de colonnes : uniquement dans la liste bureau (≥900px) */
+.event-list__columns {
+  display: none;
+}
+
 .empty-state {
   display: none;
   text-align: center;
@@ -1189,7 +1194,7 @@ main {
   }
 
   .page-title h1 {
-    font-size: 40px;
+    font-size: var(--font-size-5xl);
     letter-spacing: 0.3px;
   }
 
@@ -1198,13 +1203,13 @@ main {
   }
 
   .page-title {
-    padding-top: 56px;
-    padding-bottom: 28px;
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-8);
   }
 
   .filters {
-    padding-top: 8px;
-    padding-bottom: 40px;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-12);
   }
 
   .filters__search-col {
@@ -1229,15 +1234,16 @@ main {
   }
 
   .chip {
-    padding: 14px 20px;
+    padding: var(--space-4) var(--space-6);
   }
 
   .event-groups {
-    padding-bottom: 56px;
+    gap: var(--space-12);
+    padding-bottom: var(--space-12);
   }
 
   .event-group__header {
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-6);
   }
 
   .event-group__bar {
@@ -1245,8 +1251,108 @@ main {
   }
 
   .event-group__title {
-    font-size: 19px;
+    font-size: var(--font-size-2xl);
     letter-spacing: normal;
+  }
+
+  /* Calendrier bureau : liste chronologique, une rando par ligne.
+     Même balisage que la carte mobile, mis en grille ; le corps de carte
+     s'efface (display: contents) pour que ses enfants deviennent des colonnes. */
+  .event-groups {
+    --event-row-columns: 4px 96px minmax(0, 1fr) 160px 104px 112px;
+    --event-row-gap: var(--space-4);
+  }
+
+  .event-list__columns,
+  .event-list--rows .event-card {
+    display: grid;
+    grid-template-columns: var(--event-row-columns);
+    column-gap: var(--event-row-gap);
+    align-items: center;
+  }
+
+  .event-list__columns {
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .event-list--rows {
+    gap: 0;
+  }
+
+  .event-list--rows .event-card {
+    min-height: 60px;
+    padding: var(--space-4) var(--space-4) var(--space-4) 0;
+    background: var(--color-bg);
+    border-radius: 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .event-list--rows .event-card:hover {
+    background: var(--color-surface);
+  }
+
+  .event-list--rows .event-card__accent {
+    align-self: stretch;
+    border-radius: var(--radius-2xs);
+  }
+
+  .event-list--rows .event-card__date {
+    width: auto;
+    height: auto;
+    display: grid;
+    grid-template-columns: 38px auto;
+    column-gap: var(--space-2);
+    align-items: center;
+    justify-content: start;
+    justify-items: start;
+    background: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  .event-list--rows .event-card__day {
+    grid-row: 1 / 3;
+  }
+
+  .event-list--rows .event-card__month {
+    align-self: end;
+  }
+
+  .event-list--rows .event-card__year {
+    align-self: start;
+  }
+
+  .event-list--rows .event-card__body {
+    display: contents;
+  }
+
+  .event-list--rows .event-card__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .event-list--rows .event-card__meta {
+    font-size: var(--font-size-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .event-list--rows .badge {
+    margin-top: 0;
+  }
+
+  .event-list--rows .event-card__action {
+    display: block;
+    text-align: right;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-brand);
   }
 
   .site-footer {
@@ -1260,6 +1366,13 @@ main {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .event-groups {
+    --event-row-columns: 4px 120px minmax(0, 1fr) 240px 140px 150px;
+    --event-row-gap: var(--space-6);
   }
 }
 

@@ -136,7 +136,9 @@
       '<span class="event-group__bar" aria-hidden="true"></span>' +
       '<h2 class="event-group__title" id="' + headingId + '">' + escapeHtml(title) + '</h2>' +
       '</div>' +
-      '<ul class="event-list">' + group.items.map(cardHTML).join("") + '</ul>' +
+      // En-tête de colonnes de la liste bureau : décoratif, chaque ligne porte déjà son contenu.
+      '<div class="event-list__columns" aria-hidden="true"><span></span><span>Date</span><span>Randonnée</span><span>Lieu</span><span>Statut</span><span></span></div>' +
+      '<ol class="event-list event-list--rows">' + group.items.map(cardHTML).join("") + '</ol>' +
       '</section>'
     );
   }
