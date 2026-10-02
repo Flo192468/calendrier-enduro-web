@@ -9,12 +9,16 @@
   /* Couleurs */
   --color-bg: #ffffff;
   --color-surface: #f8f8f8;
+  --color-surface-hover: #f1f1f1;
   --color-text: #1a1a1b;
   --color-text-strong: #121212;
   --color-text-muted: #5c5c5c;
   --color-placeholder: #99999e;
   --color-border: #8f8f8f;
-  --color-border-soft: #ededed;
+  --color-border-subtle: #ededed;
+  --color-border-soft: #e5e5e5; /* bordure décorative du bloc date (Figma border/soft → grey-150) */
+  --color-border-divider: #ececec; /* séparateurs de la fiche (Figma border/divider → grey-200) */
+  --color-text-disabled: #9e9e9e; /* liens désactivés (Figma text/disabled → grey-300) */
   --color-brand: #e10f21;
   --color-brand-on-dark: #ed3324; /* variante lisible sur fond sombre, non utilisée sur cette version claire mais gardée en réserve */
   --color-on-brand: #ffffff;
@@ -38,19 +42,42 @@
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 
+  /* Tailles de police (Figma Font/font-size-*) */
+  --font-size-2xs: 10px;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 22px;
+  --font-size-4xl: 24px;
+  --font-size-5xl: 40px;
+  --font-size-icon: 20px;
+
   /* Rayons */
+  --radius-2xs: 2px;
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 16px;
   --radius-pill: 999px;
 
-  /* Espacements */
+  /* Espacements : --space-N = N × 4px.
+     Échelle Figma : spacing-1 = --space-1 (4), spacing-2 = --space-2 (8),
+     spacing-3 = --space-4 (16), spacing-4 = --space-6 (24), spacing-5 = --space-8 (32),
+     spacing-6 = --space-12 (48), spacing-7 = --space-16 (64).
+     --space-3 (12) et --space-5 (20) sont hors échelle v1.1 : à ne plus utiliser dans le code nouveau. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
 
   /* Layout */
   --container-max: 1200px;
@@ -201,7 +228,7 @@ textarea {
    ========================================================================== */
 .site-header {
   background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--color-border-subtle);
   padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
 }
 
@@ -281,13 +308,14 @@ textarea {
   color: var(--color-brand);
 }
 
-.primary-nav__link[aria-current="page"] {
+.primary-nav__link[aria-current="page"],
+.primary-nav__link[aria-current="true"] {
   color: var(--color-brand);
   border-bottom-color: var(--color-brand);
 }
 
 .primary-nav__link[aria-disabled="true"] {
-  color: var(--color-text-muted);
+  color: var(--color-text-disabled);
   cursor: default;
   pointer-events: none;
 }
@@ -457,7 +485,7 @@ main {
 }
 
 .section {
-  padding: var(--space-6) var(--space-5);
+  padding: var(--space-6);
 }
 
 .section__header {
@@ -496,27 +524,47 @@ main {
 .event-list {
   max-width: var(--container-max);
   margin-inline: auto;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 /* ==========================================================================
    Carte rando (composant partagé Accueil / Calendrier)
    ========================================================================== */
+/* v1.1 : plus de vignette photo, un bloc date la remplace.
+   Toute la carte est cliquable via un seul lien (titre) dont la zone est
+   étendue à la carte par ::after. */
 .event-card {
+  position: relative;
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-4);
   align-items: stretch;
   background: var(--color-surface);
   border-radius: var(--radius-sm);
-  padding: var(--space-3);
-  text-decoration: none;
+  padding: var(--space-4);
   color: inherit;
 }
 
 .event-card:hover {
-  background: #f1f1f1;
+  background: var(--color-surface-hover);
+}
+
+.event-card:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.event-card__link:focus-visible {
+  box-shadow: none;
+}
+
+.event-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
 }
 
 .event-card__accent {
@@ -534,28 +582,47 @@ main {
   background: var(--color-accent-cancelled);
 }
 
-.event-card__thumb {
+/* Bloc date : jour / mois / année, couleurs selon le statut */
+.event-card__date {
+  flex-shrink: 0;
   width: 72px;
   height: 72px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  flex-shrink: 0;
-  background: var(--color-border-soft);
-}
-
-.event-card__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Rando sans photo : pictogramme décoratif à la place de la vignette */
-.event-card__thumb--empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--color-placeholder);
-  font-size: 28px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+
+.event-card__day {
+  font-size: var(--font-size-4xl);
+  font-weight: 900;
+  line-height: 28px;
+}
+
+.event-card__month {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent-upcoming);
+}
+
+.event-card__year {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.event-card[data-status="cancelled"] .event-card__month {
+  color: var(--color-accent-cancelled);
+}
+
+.event-card[data-status="past"] .event-card__day,
+.event-card[data-status="past"] .event-card__month {
+  color: var(--color-badge-past-text);
 }
 
 .event-card__body {
@@ -568,15 +635,24 @@ main {
 }
 
 .event-card__title {
-  font-size: 15px;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text);
   overflow-wrap: break-word;
 }
 
 .event-card__meta {
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--color-text-muted);
+}
+
+/* Indice visuel de la liste bureau du calendrier, pas un second lien */
+.event-card__status {
+  display: flex;
+}
+
+.event-card__action {
+  display: none;
 }
 
 .badge {
@@ -584,9 +660,9 @@ main {
   align-items: center;
   align-self: flex-start;
   margin-top: var(--space-1);
-  padding: 4px var(--space-2);
-  border-radius: 4px;
-  font-size: 11px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-xs);
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
   background: var(--color-badge-upcoming-bg);
@@ -653,7 +729,7 @@ main {
    Page "Calendrier des randonnées"
    ========================================================================== */
 .page-title {
-  padding: var(--space-6) var(--space-5) var(--space-2);
+  padding: var(--space-6) var(--space-6) var(--space-2);
 }
 
 .page-title__inner {
@@ -677,7 +753,7 @@ main {
 }
 
 .filters {
-  padding: var(--space-2) var(--space-5) var(--space-4);
+  padding: var(--space-2) var(--space-6) var(--space-4);
 }
 
 .filters__inner {
@@ -724,12 +800,12 @@ main {
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  padding: 14px var(--space-3) 14px 16px;
-  font-size: 14px;
+  padding: var(--space-4);
+  font-size: var(--font-size-base);
   font-weight: 500;
   color: var(--color-text);
   min-height: 44px;
@@ -833,6 +909,13 @@ main {
   font-weight: 600;
 }
 
+/* Accueil : 6 prochaines randos en bureau, 3 seulement sur mobile et tablette */
+@media (max-width: 899px) {
+  .event-list--grid > .event-card:nth-child(n + 4) {
+    display: none;
+  }
+}
+
 .event-list__status {
   padding: var(--space-4);
   color: var(--color-text-muted);
@@ -843,7 +926,7 @@ main {
 .event-groups {
   max-width: var(--container-max);
   margin-inline: auto;
-  padding: 0 var(--space-5) var(--space-6);
+  padding: 0 var(--space-6) var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -860,8 +943,12 @@ main {
   width: 4px;
   height: 16px;
   border-radius: var(--radius-pill);
-  background: var(--color-brand);
+  background: var(--color-accent-upcoming);
   flex-shrink: 0;
+}
+
+.event-group--past .event-group__bar {
+  background: var(--color-accent-past);
 }
 
 .event-group__title {
@@ -874,6 +961,11 @@ main {
 .event-group .event-list {
   margin: 0;
   max-width: none;
+}
+
+/* En-tête de colonnes : uniquement dans la liste bureau (≥900px) */
+.event-list__columns {
+  display: none;
 }
 
 .empty-state {
@@ -906,7 +998,7 @@ main {
   right: 0;
   bottom: 0;
   background: #fff;
-  border-top: 1px solid var(--color-border-soft);
+  border-top: 1px solid var(--color-border-subtle);
   padding: var(--space-2) var(--space-4);
   display: flex;
   z-index: 100;
@@ -965,7 +1057,7 @@ main {
    Pied de page léger (informations, hors zone tactile mobile)
    ========================================================================== */
 .site-footer {
-  border-top: 1px solid var(--color-border-soft);
+  border-top: 1px solid var(--color-border-subtle);
   padding: var(--space-6) var(--space-5);
   text-align: center;
   color: var(--color-text-muted);
@@ -989,6 +1081,7 @@ main {
 }
 
 .site-footer a[aria-disabled="true"] {
+  color: var(--color-text-disabled);
   pointer-events: none;
 }
 
@@ -1105,60 +1198,12 @@ main {
     gap: var(--space-4);
   }
 
-  .event-card {
-    flex-direction: column;
-  }
-
-  .event-list--grid .event-card,
-  .event-group .event-list .event-card {
-    height: 100%;
-    padding: 0;
-    gap: 0;
-    overflow: hidden;
-  }
-
-  .event-list--grid .event-card__accent,
-  .event-group .event-list .event-card__accent {
-    width: 100%;
-    height: 4px;
-    border-radius: 0;
-  }
-
-  .event-list--grid .event-card__thumb,
-  .event-group .event-list .event-card__thumb {
-    width: 100%;
-    height: 200px;
-    border-radius: 0;
-  }
-
-  .event-list--grid .event-card__body,
-  .event-group .event-list .event-card__body {
-    padding: 16px 18px 18px;
-    gap: var(--space-2);
-  }
-
-  .event-list--grid .event-card__title,
-  .event-group .event-list .event-card__title {
-    font-size: 17px;
-  }
-
-  .event-list--grid .event-card__meta,
-  .event-group .event-list .event-card__meta {
-    font-size: 14px;
-  }
-
-  .event-list--grid .badge,
-  .event-group .event-list .badge {
-    font-size: 12px;
-    margin-top: 0;
-  }
-
   .page-title__inner {
     gap: var(--space-3);
   }
 
   .page-title h1 {
-    font-size: 40px;
+    font-size: var(--font-size-5xl);
     letter-spacing: 0.3px;
   }
 
@@ -1167,13 +1212,13 @@ main {
   }
 
   .page-title {
-    padding-top: 56px;
-    padding-bottom: 28px;
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-8);
   }
 
   .filters {
-    padding-top: 8px;
-    padding-bottom: 40px;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-12);
   }
 
   .filters__search-col {
@@ -1198,15 +1243,16 @@ main {
   }
 
   .chip {
-    padding: 14px 20px;
+    padding: var(--space-4) var(--space-6);
   }
 
   .event-groups {
-    padding-bottom: 56px;
+    gap: var(--space-12);
+    padding-bottom: var(--space-12);
   }
 
   .event-group__header {
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-6);
   }
 
   .event-group__bar {
@@ -1214,14 +1260,108 @@ main {
   }
 
   .event-group__title {
-    font-size: 19px;
+    font-size: var(--font-size-2xl);
     letter-spacing: normal;
   }
 
-  .event-group .event-list {
+  /* Calendrier bureau : liste chronologique, une rando par ligne.
+     Même balisage que la carte mobile, mis en grille ; le corps de carte
+     s'efface (display: contents) pour que ses enfants deviennent des colonnes. */
+  .event-groups {
+    --event-row-columns: 4px 96px minmax(0, 1fr) 160px 104px 112px;
+    --event-row-gap: var(--space-4);
+  }
+
+  .event-list__columns,
+  .event-list--rows .event-card {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-6);
+    grid-template-columns: var(--event-row-columns);
+    column-gap: var(--event-row-gap);
+    align-items: center;
+  }
+
+  .event-list__columns {
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .event-list--rows {
+    gap: 0;
+  }
+
+  .event-list--rows .event-card {
+    min-height: 60px;
+    padding: var(--space-4) var(--space-4) var(--space-4) 0;
+    background: var(--color-bg);
+    border-radius: 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .event-list--rows .event-card:hover {
+    background: var(--color-surface);
+  }
+
+  .event-list--rows .event-card__accent {
+    align-self: stretch;
+    border-radius: var(--radius-2xs);
+  }
+
+  .event-list--rows .event-card__date {
+    width: auto;
+    height: auto;
+    display: grid;
+    grid-template-columns: 38px auto;
+    column-gap: var(--space-2);
+    align-items: center;
+    justify-content: start;
+    justify-items: start;
+    background: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  .event-list--rows .event-card__day {
+    grid-row: 1 / 3;
+  }
+
+  .event-list--rows .event-card__month {
+    align-self: end;
+  }
+
+  .event-list--rows .event-card__year {
+    align-self: start;
+  }
+
+  .event-list--rows .event-card__body {
+    display: contents;
+  }
+
+  .event-list--rows .event-card__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .event-list--rows .event-card__meta {
+    font-size: var(--font-size-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .event-list--rows .badge {
+    margin-top: 0;
+  }
+
+  .event-list--rows .event-card__action {
+    display: block;
+    text-align: right;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-brand);
   }
 
   .site-footer {
@@ -1239,8 +1379,9 @@ main {
 }
 
 @media (min-width: 1200px) {
-  .event-group .event-list {
-    grid-template-columns: repeat(3, 1fr);
+  .event-groups {
+    --event-row-columns: 4px 120px minmax(0, 1fr) 240px 140px 150px;
+    --event-row-gap: var(--space-6);
   }
 }
 
@@ -1313,7 +1454,7 @@ main {
 
 .map-sidebar__divider {
   border: none;
-  border-top: 1px solid var(--color-border-soft);
+  border-top: 1px solid var(--color-border-subtle);
   margin: 0;
 }
 
@@ -1524,7 +1665,7 @@ body.detail-page {
   align-items: center;
   gap: var(--space-2);
   padding: 10px var(--space-5) 10px var(--space-2);
-  border-bottom: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .detail-header__back {
@@ -1548,45 +1689,21 @@ body.detail-page {
   color: var(--color-text);
 }
 
-.detail-hero {
-  position: relative;
-  height: 240px;
-  background: var(--color-border-soft);
-  overflow: hidden;
-}
-
-.detail-hero img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Fiche sans photo : même pictogramme décoratif que sur les cartes */
-.detail-hero--empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-placeholder);
-  font-size: 48px;
-}
-
-.detail-hero .badge {
-  position: absolute;
-  left: var(--space-4);
-  top: var(--space-4);
-}
-
 .detail-title-meta {
   max-width: var(--container-max);
   margin-inline: auto;
-  padding: var(--space-5) var(--space-5) var(--space-1);
+  padding: var(--space-6) var(--space-6) var(--space-1);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
+.detail-title-meta .badge {
+  margin-top: 0;
+}
+
 .detail-title-meta h1 {
-  font-size: 22px;
+  font-size: var(--font-size-3xl);
   font-weight: 900;
   color: var(--color-text);
   line-height: 1.25;
@@ -1610,33 +1727,43 @@ body.detail-page {
   margin-inline: auto;
   width: 100%;
   display: flex;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5) var(--space-1);
+  align-items: stretch;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-1);
 }
 
+/* Les 3 cartes ont la même hauteur : valeur poussée en bas, valeurs alignées */
 .detail-stat {
   flex: 1;
+  min-width: 0;
   background: var(--color-surface);
   border-radius: var(--radius-sm);
-  padding: var(--space-3) 10px;
+  padding: var(--space-4) var(--space-2);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.detail-stat__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .detail-stat .icon {
   color: var(--color-brand);
-  font-size: 15px;
+  font-size: var(--font-size-lg);
 }
 
 .detail-stat__label {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-muted);
 }
 
 .detail-stat__value {
-  font-size: 15px;
+  font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -1645,14 +1772,14 @@ body.detail-page {
   max-width: var(--container-max);
   margin-inline: auto;
   width: 100%;
-  padding: var(--space-5) var(--space-5) var(--space-1);
+  padding: var(--space-6) var(--space-6) var(--space-1);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
 .detail-section h2 {
-  font-size: 16px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -1712,7 +1839,6 @@ body.detail-page {
 }
 
 .contact-list {
-  background: var(--color-surface);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -1720,13 +1846,13 @@ body.detail-page {
 .contact-list__row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
   min-height: 44px;
-  padding: var(--space-3);
-  font-size: 14px;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-base);
   font-weight: 500;
   color: var(--color-text);
-  border-bottom: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--color-border-divider);
 }
 
 .contact-list__row:last-child {
@@ -1734,7 +1860,7 @@ body.detail-page {
 }
 
 .contact-list__row:hover {
-  background: #f1f1f1;
+  background: var(--color-surface-hover);
 }
 
 .contact-list__row .icon {
@@ -1750,7 +1876,7 @@ body.detail-page {
   bottom: 0;
   z-index: 10;
   background: #fff;
-  border-top: 1px solid var(--color-border-soft);
+  border-top: 1px solid var(--color-border-subtle);
   padding: var(--space-3) var(--space-5);
   max-width: var(--container-max);
   margin-inline: auto;
@@ -1839,38 +1965,106 @@ body.detail-page {
   font-size: 14px;
 }
 
+/* En-tête bureau (nav principale) et lien retour : affichés à partir de 900px */
+.site-header--wide,
+.detail-back-link {
+  display: none;
+}
+
+.detail-booking {
+  padding-bottom: var(--space-6);
+}
+
 @media (min-width: 900px) {
   body.detail-page {
-    padding-bottom: calc(var(--detail-cta-height) + var(--space-5));
+    padding-bottom: 0;
   }
 
   .detail-header {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
+    display: none;
   }
 
-  .detail-hero {
-    height: 340px;
+  .site-header--wide {
+    display: block;
+  }
+
+  .detail-main {
+    max-width: calc(var(--container-max) + var(--space-6) * 2);
+    margin-inline: auto;
+    padding: var(--space-12) var(--space-6) var(--space-16);
+  }
+
+  .detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    margin-bottom: var(--space-6);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .detail-back-link:hover {
+    color: var(--color-brand);
+  }
+
+  /* Colonne principale fluide + carte de réservation de 384px */
+  .detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 384px;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
   }
 
   .detail-title-meta,
   .detail-stats,
   .detail-section {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
+    max-width: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .detail-title-meta,
-  .detail-stats,
-  .detail-section {
-    max-width: 640px;
+  .detail-title-meta {
+    gap: var(--space-4);
   }
 
+  .detail-title-meta h1 {
+    font-size: var(--font-size-5xl);
+    line-height: 1.2;
+  }
+
+  .mini-map {
+    height: 280px;
+  }
+
+  .detail-booking {
+    position: sticky;
+    top: var(--space-6);
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+  }
+
+  .contact-list__row:hover {
+    background: var(--color-surface-hover);
+  }
+
+  /* Le CTA fixe du mobile devient le bouton pleine largeur de la carte de réservation */
   .detail-cta {
-    max-width: 640px;
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
-    padding-bottom: var(--space-5);
+    position: static;
+    max-width: none;
+    margin-top: var(--space-2);
+    padding: 0;
+    background: none;
+    border-top: none;
   }
 }
 
@@ -1971,7 +2165,7 @@ select.field__input {
   margin: 0;
   padding: var(--space-5) 0 0;
   border: none;
-  border-top: 1px solid var(--color-border-soft);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .form__legend {
