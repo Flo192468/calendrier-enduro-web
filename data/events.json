@@ -226,5 +226,24 @@
     "organizerDescription": "Balade d'enduro à travers les paysages du Val de Senouire, en deux boucles (80 km le matin, 75 km l'après-midi) entrecoupées d'un repas préparé par un traiteur local. Source : HelloAsso.",
     "contactPhone": "",
     "contactEmail": "motoclubvaldesenouire@gmail.com"
+  },
+  {
+    "id": "traces-de-la-bete-2026",
+    "title": "Les Traces de la Bête 2026 (rando vintage)",
+    "location": "Saint-Priest-la-Feuille",
+    "dept": "23",
+    "date": "2026-06-20",
+    "time": "Départ 1ère boucle le matin, 2e boucle l'après-midi",
+    "status": "past",
+    "distanceKm": 110,
+    "price": 60,
+    "loops": 2,
+    "meetingPoint": "Ancien terrain de football, Saint-Priest-la-Feuille (23300), à ~10 km au sud de Noth",
+    "lat": 46.2025,
+    "lng": 1.5361,
+    "organizerName": "Organisateur non identifié avec certitude (contact « Laredac » via le forum Le Guide Vert / SRCF)",
+    "organizerDescription": "Randonnée enduro réservée aux motos vintage/anciennes, 2 boucles de 55 km (matin et après-midi), max. 100 participants, repas sur place et soirée conviviale (apéritif, grillades). Source : freenduro.com. Nom de l'organisateur à confirmer avant toute republication — seul un pseudo de forum (« Laredac ») a été trouvé, pas de nom de club.",
+    "contactPhone": "06 08 13 52 25",
+    "contactEmail": ""
   }
 ]
